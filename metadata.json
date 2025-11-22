@@ -1,0 +1,5 @@
+{
+  "name": "Trae-G: Google AI Workspace",
+  "description": "An intelligent, collaborative AI IDE experience powered by Google Gemini 2.5, featuring code generation, syntax highlighting, and a chat-to-code workflow.",
+  "requestFramePermissions": []
+}
