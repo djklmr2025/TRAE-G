@@ -27,19 +27,19 @@ function App() {
   const handleSendMessage = async (text: string) => {
     if (!hasStarted) setHasStarted(true);
     setIsLoading(true);
-    
+
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: text,
       timestamp: Date.now(),
     };
-    
+
     setMessages(prev => [...prev, userMsg]);
 
     try {
       const stream = sendMessageStream(text);
-      
+
       const botMsgId = (Date.now() + 1).toString();
       let fullContent = '';
 
@@ -53,30 +53,30 @@ function App() {
 
       for await (const chunk of stream) {
         fullContent += chunk;
-        
+
         // Update Message UI
-        setMessages(prev => prev.map(msg => 
+        setMessages(prev => prev.map(msg =>
           msg.id === botMsgId ? { ...msg, content: fullContent } : msg
         ));
 
         // Real-time Code Parsing
         const newFiles = parseCodeToFiles(fullContent);
         if (newFiles.length > 0) {
-            setFiles(prev => {
-                // Merge new files with existing, overwriting if name matches
-                const fileMap = new Map(prev.map(f => [f.name, f]));
-                newFiles.forEach(f => fileMap.set(f.name, f));
-                return Array.from(fileMap.values());
-            });
-            
-            // Auto-select the first file if none selected
-            if (!activeFile && newFiles.length > 0) {
-                setActiveFile(newFiles[0]);
-            } else if (activeFile) {
-                // If active file is being updated, trigger re-render by updating reference
-                const updatedActive = newFiles.find(f => f.name === activeFile.name);
-                if (updatedActive) setActiveFile(updatedActive);
-            }
+          setFiles(prev => {
+            // Merge new files with existing, overwriting if name matches
+            const fileMap = new Map(prev.map(f => [f.name, f]));
+            newFiles.forEach(f => fileMap.set(f.name, f));
+            return Array.from(fileMap.values());
+          });
+
+          // Auto-select the first file if none selected
+          if (!activeFile && newFiles.length > 0) {
+            setActiveFile(newFiles[0]);
+          } else if (activeFile) {
+            // If active file is being updated, trigger re-render by updating reference
+            const updatedActive = newFiles.find(f => f.name === activeFile.name);
+            if (updatedActive) setActiveFile(updatedActive);
+          }
         }
       }
     } catch (error) {
@@ -102,21 +102,28 @@ function App() {
   };
 
   if (!process.env.API_KEY) {
-      return (
-          <div className="h-screen w-screen bg-ide-bg flex items-center justify-center text-white">
-              <div className="p-8 border border-red-500 rounded bg-red-900/20 max-w-lg text-center">
-                  <h1 className="text-2xl font-bold mb-4">Missing API Key</h1>
-                  <p className="mb-4">Please provide <code className="bg-black/30 px-2 py-1 rounded">process.env.API_KEY</code> to run Trae-G.</p>
-              </div>
-          </div>
-      )
+    return (
+      <div className="h-screen w-screen bg-ide-bg flex items-center justify-center text-white">
+        <div className="p-8 border border-red-500 rounded bg-red-900/20 max-w-lg text-center">
+          <h1 className="text-2xl font-bold mb-4">Missing API Key</h1>
+          <p className="mb-4">Please provide <code className="bg-black/30 px-2 py-1 rounded">process.env.API_KEY</code> to run Trae-G.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex h-screen w-screen bg-ide-bg text-ide-text font-sans overflow-hidden">
       {/* Left: Chat Sidebar (Width 350px fixed for now) */}
       <div className="w-[380px] flex-shrink-0 h-full flex flex-col border-r border-ide-border">
-        <ChatInterface 
+        <div className="p-3 bg-ide-sidebar border-b border-ide-border flex justify-between items-center shadow-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <span className="font-bold text-blue-400 tracking-wider">TRAE-G</span>
+          </div>
+          <span className="text-xs text-gray-400 font-mono border border-gray-700 px-2 py-0.5 rounded">Arkaios Core</span>
+        </div>
+        <ChatInterface
           messages={messages}
           isLoading={isLoading}
           currentModel={currentModel}
@@ -127,10 +134,10 @@ function App() {
 
       {/* Middle: File Explorer (Narrow) */}
       <div className="w-[200px] flex-shrink-0 h-full bg-ide-sidebar border-r border-ide-border hidden md:block">
-        <FileExplorer 
-          files={files} 
-          activeFile={activeFile} 
-          onSelectFile={setActiveFile} 
+        <FileExplorer
+          files={files}
+          activeFile={activeFile}
+          onSelectFile={setActiveFile}
         />
       </div>
 

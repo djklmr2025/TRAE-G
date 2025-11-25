@@ -1,7 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, use } from 'react';
 import { Send, Sparkles, Bot, User, Loader2, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Message, GeminiModel } from '../types';
+import { before } from 'node:test';
+import { type } from 'os';
+import { ref } from 'process';
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -91,7 +94,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <Sparkles size={48} className="text-google-yellow" />
             <div>
               <p className="text-sm font-medium text-gray-300">Welcome to Trae-G</p>
-              <p className="text-xs mt-1">Powered by Google Gemini</p>
+              <p className="text-xs mt-1">Powered by Arkaios</p>
             </div>
           </div>
         )}
