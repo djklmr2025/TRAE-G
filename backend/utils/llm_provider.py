@@ -22,7 +22,10 @@ def get_llm(agent: str, temperature: float = 0.0, max_tokens: int = None, thinki
         langchain-compatible LLM object
     """
     model_type = os.getenv(f"{agent.upper()}_AGENT_MODEL_TYPE")
+    if model_type:
+        model_type = model_type.strip().lower()
     model_id = os.getenv(f"{agent.upper()}_AGENT_MODEL_ID")
+    print(f"DEBUG: agent={agent}, model_type='{model_type}'")
 
     if not model_type or not model_id:
         raise ValueError(f"Missing model config for agent: {agent}")
@@ -94,6 +97,17 @@ def get_llm(agent: str, temperature: float = 0.0, max_tokens: int = None, thinki
                 config=boto3_config,
                 region_name=os.getenv("BEDROCK_REGION", "us-east-1")
             )
+
+    elif model_type == "gemini":
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(
+            model=model_id,
+            google_api_key=os.getenv("GEMINI_API_KEY"),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            timeout=None,
+            max_retries=2
+        )
 
     else:
         raise ValueError(f"Unsupported model type '{model_type}' for agent '{agent}'")

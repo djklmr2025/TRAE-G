@@ -35,6 +35,8 @@ target_metadata = SQLModel.metadata
 
 
 def get_db_url():
+    if os.getenv('DB_CONNECTION_STRING'):
+        return os.getenv('DB_CONNECTION_STRING')
     return ('postgresql://' + os.getenv('DB_USERNAME') + ':' + os.getenv('DB_PASSWORD') +
             '@' + os.getenv('DB_HOST') + ':' + os.getenv('DB_PORT') + '/' + os.getenv('DB_DATABASE'))
 
@@ -81,7 +83,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata,
+            render_as_batch=True
         )
 
         with context.begin_transaction():

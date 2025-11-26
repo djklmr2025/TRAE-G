@@ -30,7 +30,7 @@ function Login() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const isFormValid = () => {
     let isValid = email.length > 0 && password.length > 0;
     isValid = isValid && EMAIL_REGEX.test(email);
@@ -52,16 +52,17 @@ function Login() {
       return;
     }
     dispatch(setLoadingDialog(true));
-    axios.post('/auth/login', {email: email, password: password}, API_KEY_HEADER).then((response) => {
+    axios.post('/auth/login', { email: email, password: password }, API_KEY_HEADER).then((response) => {
       dispatch(setLoadingDialog(false));
       window.electronAPI.setToken(response.data.token);
       window.electronAPI.setRefreshToken(response.data.refresh_token);
       window.location.reload();
     }).catch((error) => {
       dispatch(setLoadingDialog(false));
-      if (error.response.status === constants.status.UNAUTHORIZED) {
+      if (error.response && error.response.status === constants.status.UNAUTHORIZED) {
         dispatch(setError(true, 'Incorrect Email or Password, Please try again.'));
       } else {
+        console.error("Login error:", error);
         dispatch(setError(true, constants.GENERAL_ERROR));
       }
       setTimeout(() => {
@@ -73,23 +74,23 @@ function Login() {
   const loginWithGoogle = async () => {
     try {
       const { code, codeVerifier } = await window.electronAPI.loginWithGoogle();
-  
+
       const response = await axios.post('/auth/login_google_desktop', {
         code,
         code_verifier: codeVerifier,
       });
-  
+
       const { token, refresh_token } = response.data;
-  
+
       window.electronAPI.setToken(token);
       window.electronAPI.setRefreshToken(refresh_token);
-  
+
       window.location.reload();
     } catch (error) {
       console.error('Login failed:', error);
     }
   };
-  
+
   useEffect(() => {
     setTitle();
   }, []);
@@ -103,7 +104,7 @@ function Login() {
               src={neuralagent_logo_white}
               height={45}
               alt="NeuralAgent"
-              style={{userSelect: 'none', pointerEvents: 'none'}}
+              style={{ userSelect: 'none', pointerEvents: 'none' }}
             />
             <FlexSpacer isRTL={false} />
             <Button color="#fff"
@@ -115,14 +116,14 @@ function Login() {
           </AccountHeader>
           <AccountDiv>
             <InfoContainer>
-              <FormTitle style={{textAlign: 'center'}}>
+              <FormTitle style={{ textAlign: 'center' }}>
                 Login to NeuralAgent
               </FormTitle>
-              <AccountTextField placeholder={'Email'} style={{marginTop: '30px'}} type="email"
+              <AccountTextField placeholder={'Email'} style={{ marginTop: '30px' }} type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e)} />
-              <AccountTextField placeholder={'Password'} style={{marginTop: '10px'}} type="password"
+              <AccountTextField placeholder={'Password'} style={{ marginTop: '10px' }} type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e)} />
@@ -133,12 +134,12 @@ function Login() {
                 onClick={() => loginUser()}>
                 Login
               </Button>
-              <FlexSpacer isRTL={false} style={{marginTop: '10px'}}>
-                <Link to="/forgot-password" style={{color: 'white'}}>
+              <FlexSpacer isRTL={false} style={{ marginTop: '10px' }}>
+                <Link to="/forgot-password" style={{ color: 'white' }}>
                   Forgot Password?
                 </Link>
               </FlexSpacer>
-              <div style={{marginTop: '10px', textAlign: 'center'}}>
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
                 <OrDiv>
                   <Text fontSize="18px" color="#fff">
                     OR
@@ -146,7 +147,7 @@ function Login() {
                 </OrDiv>
                 <Button color="#fff" padding="10px 14px" fontSize="16px" borderRadius={10}
                   block
-                  style={{marginTop: '10px'}}
+                  style={{ marginTop: '10px' }}
                   onClick={() => loginWithGoogle()}>
                   <BtnIcon iconSize='22px' left>
                     <FcGoogle />

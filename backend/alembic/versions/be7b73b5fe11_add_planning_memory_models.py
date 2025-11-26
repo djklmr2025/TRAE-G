@@ -57,7 +57,8 @@ def upgrade() -> None:
     op.create_index(op.f('ix_plan_subtasks_id'), 'plan_subtasks', ['id'], unique=False)
     op.add_column('login_sessions', sa.Column('login_session_type', sqlmodel.sql.sqltypes.AutoString(), nullable=True))
     op.add_column('thread_messages', sa.Column('plan_subtask_id', sa.Integer(), nullable=True))
-    op.create_foreign_key(None, 'thread_messages', 'plan_subtasks', ['plan_subtask_id'], ['id'])
+    with op.batch_alter_table('thread_messages') as batch_op:
+        batch_op.create_foreign_key('fk_thread_messages_plan_subtasks', 'plan_subtasks', ['plan_subtask_id'], ['id'])
     # ### end Alembic commands ###
 
 

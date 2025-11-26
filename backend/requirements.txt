@@ -24,10 +24,10 @@ langchain-anthropic
 anthropic
 youtube-transcript-api
 beautifulsoup4
-anthropic
 transformers
 websockets
 broadcaster
 broadcaster[redis]
 asyncio-redis
 requests
+langchain-google-genai
