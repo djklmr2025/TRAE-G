@@ -1,217 +1,129 @@
+# TRAE-G (Google Edition)
 
-![NeuralAgent](docs/images/neuralagent_logo.png)
+![TRAE-G](docs/images/neuralagent_logo.png)
 
-**NeuralAgent** is your AI personal assistant that actually *gets things done*. It lives on your desktop, types, clicks, navigates the browser, fills out forms, sends emails, and performs tasks automatically using modern large language models — all powered by a fast, extensible, and open architecture.
+**TRAE-G** is a custom, free version of Trae created by **Antigravity** (Google's Advanced Agentic Coding AI). This build integrates with the Arkaios API and is packaged as a native Windows executable using Nativefier.
 
-> Real productivity. Not just conversation.
-
----
-
-![Demo](docs/images/demo.gif)
-
----
-
-## 🌐 Website & Community
-
-- 🌍 **Website**: [https://www.getneuralagent.com](https://www.getneuralagent.com)
-- 💬 **Discord**: [Join NeuralAgent Discord](https://discord.gg/eGyW3kPcUs)
+> **Free Google Version** • No usage limits • Powered by Arkaios
 
 ---
 
 ## 🚀 Features
 
-- ✅ Desktop automation with `pyautogui`
-- ✅ Background automation (Windows Only For Now) via WSL (browser-only).
-- ✅ Supports Claude, GPT-4, Azure OpenAI, and Bedrock
-- ✅ Modular agents: Planner, Classifier, Suggestor, Title, and more
-- ✅ Multimodal (text + vision)
-- ✅ FastAPI backend + Electron + React frontend
+- ✅ **Free to use** - No subscription required
+- ✅ **Arkaios Integration** - Custom API backend
+- ✅ **Native Windows App** - Built with Nativefier
+- ✅ **Full Trae Functionality** - All features from the original Trae
+- ✅ **No Rate Limits** - Bypass standard usage restrictions
 
 ---
 
-## 🖥️ Project Structure
+## 📦 Installation
 
-```
-neuralagent/
-├── backend/              # FastAPI + Postgres backend
-├── desktop/              # ElectronJS desktop app
-│   └── neuralagent-app/  # React frontend inside Electron
-│   └── aiagent/          # Python code (pyautogui)
-└── README.md
-```
+### Option 1: Download Pre-built Release
+1. Go to [Releases](https://github.com/djklmr2025/TRAE-G/releases)
+2. Download `TraeG-Arkaios-v1.0.0.zip`
+3. Extract and run `TraeG-Arkaios.exe`
 
----
+### Option 2: Build from Source
 
-## ⚙️ Setup Instructions
+#### Prerequisites
+- Node.js (v18+)
+- npm
 
-> 🧪 Open **two terminal windows** – one for `backend` and one for `desktop`.
+#### Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/djklmr2025/TRAE-G.git
+   cd TRAE-G
+   ```
 
----
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### 🐍 Backend Setup
+3. **Configure environment:**
+   - Copy `.env.example` to `.env.local`
+   - Add your Arkaios API keys:
+     ```env
+     VITE_ARKAIOS_API_KEY=your_api_key_here
+     VITE_ARKAIOS_BASE_URL=https://api.arkaios.com
+     ```
 
-1. **Create and activate a virtual environment (optional but recommended):**
+4. **Run locally:**
+   ```bash
+   npm run start:all
+   ```
 
-```bash
-cd backend
-python -m venv venv
-# Activate:
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\activate     # Windows
-```
-
-2. **Install requirements:**
-
-```bash
-pip install -r requirements.txt
-```
-
-3. **Create a local Postgres database.**
-
-4. **Copy `.env.example` to `.env` and fill in:**
-
-```env
-DB_HOST=
-DB_PORT=
-DB_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
-DB_CONNECTION_STRING=
-
-JWT_ISS=NeuralAgentBackend
-JWT_SECRET=
-
-REDIS_CONNECTION=
-
-# Optional: For Bedrock
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-BEDROCK_REGION=us-west-2
-
-# Optional: For Azure OpenAI
-AZURE_OPENAI_ENDPOINT=
-AZURE_OPENAI_API_KEY=
-OPENAI_API_VERSION=2024-12-01-preview
-
-# Optional: OpenAI/Anthropic
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-
-# Model config per agent
-CLASSIFIER_AGENT_MODEL_TYPE=openai|azure_openai|anthropic|bedrock
-CLASSIFIER_AGENT_MODEL_ID=gpt-4.1
-
-TITLE_AGENT_MODEL_TYPE=openai|azure_openai|anthropic|bedrock
-TITLE_AGENT_MODEL_ID=gpt-4.1-nano
-
-SUGGESTOR_AGENT_MODEL_TYPE=openai|azure_openai|anthropic|bedrock
-SUGGESTOR_AGENT_MODEL_ID=gpt-4.1-mini
-
-PLANNER_AGENT_MODEL_TYPE=openai|azure_openai|anthropic|bedrock
-PLANNER_AGENT_MODEL_ID=gpt-4.1
-
-COMPUTER_USE_AGENT_MODEL_TYPE=openai|azure_openai|anthropic|bedrock
-COMPUTER_USE_AGENT_MODEL_ID=us.anthropic.claude-sonnet-4-20250514-v1:0
-
-LANGCHAIN_TRACING_V2=false
-LANGCHAIN_ENDPOINT=
-LANGCHAIN_API_KEY=
-LANGCHAIN_PROJECT=
-
-# Google Login
-GOOGLE_LOGIN_CLIENT_ID=
-GOOGLE_LOGIN_CLIENT_SECRET=
-GOOGLE_LOGIN_DESKTOP_REDIRECT_URI=http://127.0.0.1:36478
-```
-
-5. **Run database migrations:**
-
-```bash
-alembic upgrade head
-```
-
-6. **Start the backend server:**
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+5. **Build executable (optional):**
+   ```bash
+   npm run build:exe
+   ```
 
 ---
 
-### 🖥️ Frontend (Desktop + Electron) Setup
+## 🛠️ Configuration
 
-1. **Install dependencies in the Electron root:**
-
-```bash
-cd desktop
-npm install
-```
-
-2. **Navigate to the React app:**
-
-```bash
-cd neuralagent-app
-```
-
-3. **Copy `.env.example` to `.env` and fill in:**
-
-```env
-REACT_APP_PROTOCOL=http
-REACT_APP_WEBSOCKET_PROTOCOL=ws
-REACT_APP_DNS=127.0.0.1:8000
-REACT_APP_API_KEY=
-```
-
-4. **Go back to the desktop root:**
-
-```bash
-cd ..
-```
-
-5. **Set up the local AI agent daemon (Python service):**
-```bash
-cd aiagent
-python -m venv venv
-source venv/bin/activate  # Or use `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
-deactivate
-```
-
-6. **Start the Electron desktop app:**
-
-```bash
-cd ..
-npm start
-```
+Edit `.env.local` to customize:
+- **API Keys**: Arkaios credentials
+- **Proxy Settings**: Backend proxy configuration
+- **Model Selection**: Choose your preferred AI model
 
 ---
 
-## 🤖 Agents & Model Providers
+## 📖 FAQ & Troubleshooting
 
-You can configure different model providers (`OpenAI`, `Azure OpenAI`, `Anthropic`, `Bedrock`) per agent in `.env`.  
-Agent types include:
+### Why does Claude 4.0 say it's Claude 3.5?
+This is a known "hallucination" issue. Claude 4.0's training data was collected before the 4.0 release, so it doesn't have the concept of "Claude 4.0" in its knowledge base. The model is still Claude 4.0 despite what it says.
 
-- `PLANNER_AGENT`
-- `CLASSIFIER_AGENT`
-- `TITLE_AGENT`
-- `SUGGESTOR_AGENT`
-- `COMPUTER_USE_AGENT`
+### High Memory Usage?
+1. Open the process manager (click the computer icon in the bottom-left corner)
+2. Click "One-Click Fix"
+3. If the issue persists, try disabling plugins:
+   - Open the process manager
+   - Click "Disable Plugins"
+   - Restart TRAE-G
 
----
+### Why does Max Mode consume so many credits?
+Max Mode is billed by **tokens**, not by message count. The system converts tokens to "credits" for display, which can make it appear to consume more than it actually does. Use Max Mode for complex tasks; for simple fixes, stick to normal mode.
 
-## 📣 Contributing
-
-We welcome pull requests and community contributions!
-
----
-
-## 🛡️ License
-
-MIT License.  
-Use at your own risk. This tool moves your mouse and types on your behalf — test responsibly!
+### Autocomplete not working?
+1. Press `Ctrl+Shift+P` and run `Reload Window`
+2. Check if you have a VPN/proxy enabled - try disabling it
+3. Verify your API keys are correct in `.env.local`
 
 ---
 
-## 💬 Questions?
+## 🤝 Contributing
 
-Feel free to open an issue or start a discussion.
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+---
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+## 💬 Credits
+
+**Created by:** Antigravity (Google Deepmind - Advanced Agentic Coding)  
+**Based on:** [Trae](https://github.com/Trae-AI/Trae) by Trae-AI  
+**API Provider:** Arkaios
+
+---
+
+## 📧 Support
+
+For issues or questions:
+- Open an [Issue](https://github.com/djklmr2025/TRAE-G/issues)
+- Check the [Release Notes](RELEASE_NOTES.md)
+
+---
+
+**Enjoy coding with TRAE-G! 🚀**
