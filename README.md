@@ -1,6 +1,7 @@
 # TRAE-G (Google Edition)
 
-![TRAE-G](docs/images/neuralagent_logo.png)
+![TRAE-G](docs/images/trae-text.png)
+neuralagent_logo.png)
 
 **TRAE-G** is a custom, free version of Trae created by **Antigravity** (Google's Advanced Agentic Coding AI). This build integrates with the Arkaios API and is packaged as a native Windows executable using Nativefier.
 
