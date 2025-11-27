@@ -47,8 +47,9 @@
    - Copy `.env.example` to `.env.local`
    - Add your Arkaios API keys:
      ```env
-     VITE_ARKAIOS_API_KEY=your_api_key_here
-     VITE_ARKAIOS_BASE_URL=https://api.arkaios.com
+     ARKAIOS_API_KEY=sk_arkaios_pr...
+     ARKAIOS_BASE_URL=https://arkaios-server-key-777e.onrender.com
+     AIDA_AUTH_TOKEN=ARKAIOS_MASTER_KEY_777e
      ```
 
 4. **Run locally:**
