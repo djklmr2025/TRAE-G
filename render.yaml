@@ -1,13 +1,5 @@
 services:
-  - type: web
+  - type: static
     name: trae-g-frontend
-    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    envVars:
-      - key: ARKAIOS_BASE_URL
-        value: https://arkaios-gateway-open.onrender.com
-      - key: ARKAIOS_API_KEY
-        value: sk_arkaios_proxy_default
-      - key: AIDA_AUTH_TOKEN
-        value: ARKAIOS_MASTER_KEY_777e
