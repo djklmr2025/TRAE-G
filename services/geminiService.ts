@@ -6,7 +6,7 @@ let apiKey: string | undefined;
 let modelId: string | undefined;
 
 export const initGemini = () => {
-  apiKey = process.env.ARKAIOS_API_KEY || process.env.API_KEY || "aOQ1ZQ4gyF5bkgxkiwPEFgkrUMW31ZEwVhOITkLRO5jaImetmUlYJegOdwG";
+  apiKey = process.env.ARKAIOS_API_KEY || process.env.API_KEY;
   baseUrl = process.env.ARKAIOS_BASE_URL || "https://arkaios-gateway-open.onrender.com";
   modelId = process.env.ARKAIOS_MODEL_ID || "arkaios";
   if (!apiKey) {
