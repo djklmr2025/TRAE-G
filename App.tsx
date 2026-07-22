@@ -17,10 +17,11 @@ function App() {
 
   // Initialize Chat
   useEffect(() => {
-    // Only init if API Key exists
-    if (process.env.API_KEY) {
-      initGemini();
+    initGemini();
+    try {
       startChat(currentModel);
+    } catch (error) {
+      console.warn("Arkaios chat is not ready:", error);
     }
   }, [currentModel]);
 
@@ -100,17 +101,6 @@ function App() {
     setActiveFile(null);
     startChat(model);
   };
-
-  if (!process.env.API_KEY) {
-    return (
-      <div className="h-screen w-screen bg-ide-bg flex items-center justify-center text-white">
-        <div className="p-8 border border-red-500 rounded bg-red-900/20 max-w-lg text-center">
-          <h1 className="text-2xl font-bold mb-4">Missing API Key</h1>
-          <p className="mb-4">Please provide <code className="bg-black/30 px-2 py-1 rounded">process.env.API_KEY</code> to run Trae-G.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen w-screen bg-ide-bg text-ide-text font-sans overflow-hidden">

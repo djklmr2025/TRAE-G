@@ -28,5 +28,56 @@ TRAE-G Arkaios-win32-x64/
 win32-x64-template-*/
 builds/
 .env/
-
 TraeG-Arkaios-v1.0.0.zip
+LICENSES.chromium.html
+
+# Local env files
+.env.local
+
+# Python caches / local backend state
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# Backend runtime artifacts
+backend/*.log
+backend/*.txt
+
+# Nativefier / Electron packaged app artifacts
+TRAE-G.exe
+*.dll
+*.pak
+*.bin
+*.dat
+locales/
+resources/
+LICENSES.chromium.html
+
+# Temporary local scripts
+start-vite.js
+
+# Local env files
+.env.local
+
+# Python caches / local backend state
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# Backend runtime artifacts
+backend/*.log
+backend/*.txt
+
+# Nativefier / Electron packaged app artifacts
+TRAE-G.exe
+*.dll
+*.pak
+*.bin
+*.dat
+locales/
+resources/
+
+# Temporary local scripts
+start-vite.js
