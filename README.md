@@ -52,6 +52,10 @@
      ARKAIOS_MODEL_ID=arkaios
      ```
 
+   In Vercel, set these as Project Environment Variables. `ARKAIOS_API_KEY`
+   is used only by the serverless `/api/chat` proxy and is not exposed to the
+   browser bundle.
+
 4. **Run locally:**
    ```bash
    npm run start:all
