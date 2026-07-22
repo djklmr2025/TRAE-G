@@ -5,6 +5,7 @@ import FileExplorer from './components/FileExplorer';
 import CodeEditor from './components/CodeEditor';
 import TerminalPanel from './components/TerminalPanel';
 import { initGemini, startChat, sendMessageStream } from './services/geminiService';
+import { downloadWorkspaceZip, publishWorkspaceToGitHub } from './services/workspaceExport';
 import { parseCodeToFiles } from './utils/codeParser';
 
 function App() {
@@ -103,6 +104,36 @@ function App() {
     startChat(model);
   };
 
+  const addSystemMessage = (content: string) => {
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      role: 'model',
+      content,
+      timestamp: Date.now()
+    }]);
+  };
+
+  const handleDownloadZip = () => {
+    try {
+      downloadWorkspaceZip(files);
+      addSystemMessage(`ZIP creado para descarga con ${files.length} archivo(s) del workspace virtual.`);
+    } catch (error) {
+      addSystemMessage(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  const handlePublishGitHub = async () => {
+    setIsLoading(true);
+    try {
+      const result = await publishWorkspaceToGitHub(files);
+      addSystemMessage(`GitHub: ${result}`);
+    } catch (error) {
+      addSystemMessage(error instanceof Error ? `GitHub no pudo publicar: ${error.message}` : String(error));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen bg-ide-bg text-ide-text font-sans overflow-hidden">
       {/* Left: Chat Sidebar (Width 350px fixed for now) */}
@@ -129,6 +160,8 @@ function App() {
           files={files}
           activeFile={activeFile}
           onSelectFile={setActiveFile}
+          onDownloadZip={handleDownloadZip}
+          onPublishGitHub={handlePublishGitHub}
         />
       </div>
 

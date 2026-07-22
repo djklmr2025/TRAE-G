@@ -1,14 +1,16 @@
 import React from 'react';
-import { FileText, Code, Hash, FileJson, File } from 'lucide-react';
+import { Download, FileText, Code, Hash, FileJson, File, Github } from 'lucide-react';
 import { VirtualFile } from '../types';
 
 interface FileExplorerProps {
   files: VirtualFile[];
   activeFile: VirtualFile | null;
   onSelectFile: (file: VirtualFile) => void;
+  onDownloadZip: () => void;
+  onPublishGitHub: () => void;
 }
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ files, activeFile, onSelectFile }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({ files, activeFile, onSelectFile, onDownloadZip, onPublishGitHub }) => {
   const getIcon = (name: string) => {
     if (name.endsWith('.tsx') || name.endsWith('.ts')) return <Code size={14} className="text-blue-400" />;
     if (name.endsWith('.css')) return <Hash size={14} className="text-blue-300" />;
@@ -21,6 +23,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, activeFile, onSelect
       <div className="p-3 border-b border-ide-border text-xs font-semibold text-ide-text uppercase tracking-wider flex items-center gap-2">
         <File size={14} />
         <span>Workspace</span>
+      </div>
+      <div className="p-2 border-b border-ide-border grid grid-cols-2 gap-2">
+        <button
+          onClick={onDownloadZip}
+          disabled={files.length === 0}
+          className="flex items-center justify-center gap-1 rounded bg-ide-bg border border-ide-border px-2 py-1.5 text-[11px] text-gray-300 hover:border-google-blue hover:text-white disabled:opacity-40 disabled:hover:border-ide-border"
+          title="Descargar ZIP del workspace virtual"
+        >
+          <Download size={13} />
+          ZIP
+        </button>
+        <button
+          onClick={onPublishGitHub}
+          disabled={files.length === 0}
+          className="flex items-center justify-center gap-1 rounded bg-ide-bg border border-ide-border px-2 py-1.5 text-[11px] text-gray-300 hover:border-google-blue hover:text-white disabled:opacity-40 disabled:hover:border-ide-border"
+          title="Crear repo GitHub con los archivos virtuales"
+        >
+          <Github size={13} />
+          GitHub
+        </button>
       </div>
       <div className="flex-1 overflow-y-auto py-2">
         {files.length === 0 ? (

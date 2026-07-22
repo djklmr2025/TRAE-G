@@ -24,6 +24,27 @@ API key de usuario: no se necesita.
 
 El flujo principal usa Puter AI con el login propio del usuario. Si Puter no está disponible, el sistema conserva un respaldo técnico por Arkaios Service Proxy para entornos owner/locales, pero el usuario final no debe pegar llaves ni configurar secretos.
 
+## Workspace virtual web
+
+La versión web/Vercel puede trabajar con proyectos virtuales generados dentro de la interfaz.
+
+Funciones disponibles:
+
+- Crear archivos virtuales desde la respuesta del agente.
+- Descargar el workspace virtual como `.zip`.
+- Publicar el workspace virtual en GitHub con autorización del usuario.
+
+Límite honesto:
+
+- La web no puede escribir directo en `C:\ARKAIOS` ni en carpetas reales de Windows.
+- Para archivos reales locales, usa la versión full/local portable.
+
+### Publicar en GitHub
+
+El botón `GitHub` puede crear un repositorio y subir los archivos virtuales usando la API oficial de GitHub.
+
+GitHub sí requiere autorización del usuario. El token se pide en pantalla, se usa en memoria para esa operación y no se guarda en el proyecto.
+
 ## Modo local real
 
 Al abrir `TRAE-G.exe`, la app carga:
@@ -84,4 +105,3 @@ TRAE-G_Arkaios_Local_Real_v1.0.1/
 - Servidor local portable preparado para empaquetado.
 - Terminal local conectada vía servidor `127.0.0.1`.
 - Release recomendado: descargar y extraer el `.zip` completo.
-
