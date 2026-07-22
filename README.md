@@ -1,152 +1,87 @@
-# TRAE-G (Google Edition)
+# TRAE-G Arkaios
 
-![TRAE-G](docs/images/trae-text.png)
+TRAE-G Arkaios es una versión portable de escritorio para Windows con chat Arkaios, editor y terminal local integrada.
 
-**TRAE-G** is a custom, free version of Trae created by **Antigravity** (Google's Advanced Agentic Coding AI). This build integrates with the Arkaios API and is packaged as a native Windows executable using Nativefier.
+## Release funcional
 
-> **Free Google Version** • No usage limits • Powered by Arkaios
+La versión local real ya funciona como paquete portable.
 
----
+Para instalar/usar desde GitHub Releases descarga el `.zip` completo del release, extráelo en una carpeta y ejecuta:
 
-## 🚀 Features
+```text
+TRAE-G.exe
+```
 
-- ✅ **Free to use** - No subscription required
-- ✅ **Arkaios Integration** - Custom API backend
-- ✅ **Native Windows App** - Built with Nativefier
-- ✅ **Full Trae Functionality** - All features from the original Trae
-- ✅ **No Rate Limits** - Bypass standard usage restrictions
+No copies solo el `.exe`. Este empaquetado Electron/Nativefier necesita ir acompañado por:
 
----
+- `resources/`
+- `locales/`
+- DLLs y archivos `.pak/.dat`
 
-## 📦 Installation
+## API key
 
-### Option 1: Download Pre-built Release
-1. Go to [Releases](https://github.com/djklmr2025/TRAE-G/releases)
-2. Download `TraeG-Arkaios-v1.0.0.zip`
-3. Extract and run `TraeG-Arkaios.exe`
+API key de usuario: no se necesita.
 
-### Option 2: Build from Source
+El flujo principal usa Puter AI con el login propio del usuario. Si Puter no está disponible, el sistema conserva un respaldo técnico por Arkaios Service Proxy para entornos owner/locales, pero el usuario final no debe pegar llaves ni configurar secretos.
 
-#### Prerequisites
-- Node.js (v18+)
-- npm
+## Modo local real
 
-#### Steps
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/djklmr2025/TRAE-G.git
-   cd TRAE-G
-   ```
+Al abrir `TRAE-G.exe`, la app carga:
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```text
+http://127.0.0.1:8787/
+```
 
-3. **Configure environment:**
-   - Copy `.env.example` to `.env.local`
-   - Add your Arkaios API keys:
-     ```env
-     TRAE_PROXY_API_KEY=your_proxy_api_key_here
-     ARKAIOS_BASE_URL=https://arkaios-service-proxy.onrender.com
-     ARKAIOS_MODEL_ID=arkaios
-     ```
+El runtime arranca el servidor local incluido en:
 
-   In Vercel, set these as Project Environment Variables. `TRAE_PROXY_API_KEY`
-   is used only by the serverless `/api/chat` proxy and is not exposed to the
-   browser bundle. `PROXY_API_KEY` is also accepted as a compatible alias.
+```text
+resources/app/local/arkaios-local-server.mjs
+```
 
-4. **Run locally:**
-   ```bash
-   npm run start:all
-   ```
+Ese servidor sirve la UI compilada desde:
 
-5. **Build executable (optional):**
-   ```bash
-   npm run build:exe
-   ```
+```text
+resources/app/dist
+```
 
-### Local Arkaios mode
+También expone el puente local de terminal para PowerShell/WSL desde la interfaz.
 
-For local terminal access, run:
+## Ejecutar desde código fuente
 
 ```bash
+npm install
+npm run build
 npm run local
 ```
 
-or on Windows:
+En Windows también puedes usar:
 
 ```bat
 ARRANCAR_ARKAIOS_LOCAL.cmd
 ```
 
-This opens Arkaios on `http://127.0.0.1:8787` and enables the local
-PowerShell/WSL terminal bridge. The terminal bridge is intentionally local-only;
-it is not available on the public Vercel deployment.
+## Empaquetado
 
----
+El artefacto de release debe ser un `.zip` completo del paquete portable, no solo el binario.
 
-## 🛠️ Configuration
+Ejemplo de estructura:
 
-Edit `.env.local` to customize:
-- **API Keys**: Arkaios credentials
-- **Proxy Settings**: Backend proxy configuration
-- **Model Selection**: Choose your preferred AI model
+```text
+TRAE-G_Arkaios_Local_Real_v1.0.1/
+  TRAE-G.exe
+  resources/
+  locales/
+  ffmpeg.dll
+  icudtl.dat
+  resources.pak
+  ...
+```
 
----
+## Estado
 
-## 📖 FAQ & Troubleshooting
+- UI web/local compilada con Vite.
+- Puter AI configurado como flujo principal sin API key del usuario.
+- Servidor local portable preparado para empaquetado.
+- Terminal local conectada vía servidor `127.0.0.1`.
+- Release recomendado: descargar y extraer el `.zip` completo.
 
-### Why does Claude 4.0 say it's Claude 3.5?
-This is a known "hallucination" issue. Claude 4.0's training data was collected before the 4.0 release, so it doesn't have the concept of "Claude 4.0" in its knowledge base. The model is still Claude 4.0 despite what it says.
-
-### High Memory Usage?
-1. Open the process manager (click the computer icon in the bottom-left corner)
-2. Click "One-Click Fix"
-3. If the issue persists, try disabling plugins:
-   - Open the process manager
-   - Click "Disable Plugins"
-   - Restart TRAE-G
-
-### Why does Max Mode consume so many credits?
-Max Mode is billed by **tokens**, not by message count. The system converts tokens to "credits" for display, which can make it appear to consume more than it actually does. Use Max Mode for complex tasks; for simple fixes, stick to normal mode.
-
-### Autocomplete not working?
-1. Press `Ctrl+Shift+P` and run `Reload Window`
-2. Check if you have a VPN/proxy enabled - try disabling it
-3. Verify your API keys are correct in `.env.local`
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
-
----
-
-## 📄 License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
----
-
-## 💬 Credits
-
-**Created by:** Antigravity (Google Deepmind - Advanced Agentic Coding)  
-**Based on:** [Trae](https://github.com/Trae-AI/Trae) by Trae-AI  
-**API Provider:** Arkaios
-
----
-
-## 📧 Support
-
-For issues or questions:
-- Open an [Issue](https://github.com/djklmr2025/TRAE-G/issues)
-- Check the [Release Notes](RELEASE_NOTES.md)
-
----
-
-**Enjoy coding with TRAE-G! 🚀**

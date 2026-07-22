@@ -86,7 +86,7 @@ function App() {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'model',
-        content: "Arkaios no pudo responder desde el servidor. Revisa que el proxy esté activo y que Vercel tenga TRAE_PROXY_API_KEY configurada.",
+        content: "Arkaios no pudo responder. Revisa tu conexion, el login de Puter AI o que el servicio local este activo. API key de usuario: no se necesita.",
         timestamp: Date.now()
       }]);
     } finally {

@@ -27,6 +27,7 @@ dist-ssr
 TRAE-G Arkaios-win32-x64/
 win32-x64-template-*/
 builds/
+release/
 .env/
 TraeG-Arkaios-v1.0.0.zip
 LICENSES.chromium.html

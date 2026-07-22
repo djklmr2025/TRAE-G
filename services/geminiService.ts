@@ -1,5 +1,15 @@
 import { GeminiModel } from "../types";
 
+declare global {
+  interface Window {
+    puter?: {
+      ai?: {
+        chat?: (message: string, options?: Record<string, unknown>) => Promise<unknown>;
+      };
+    };
+  }
+}
+
 let initialized = false;
 let modelId: string | undefined;
 
@@ -17,6 +27,12 @@ export const startChat = (_model: GeminiModel) => {
 
 export const sendMessageStream = async function* (message: string) {
   if (!initialized) throw new Error("Chat session not started");
+
+  const puterResponse = await tryPuterChat(message);
+  if (puterResponse) {
+    yield* yieldChunks(puterResponse);
+    return;
+  }
 
   const url = `/api/chat`;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -42,8 +58,35 @@ export const sendMessageStream = async function* (message: string) {
     data?.result ||
     "";
 
+  yield* yieldChunks(fullText);
+};
+
+async function tryPuterChat(message: string): Promise<string | null> {
+  if (!window.puter?.ai?.chat) return null;
+
+  try {
+    const response = await window.puter.ai.chat(message);
+    if (typeof response === "string") return response;
+    if (response && typeof response === "object") {
+      const data = response as any;
+      return (
+        data.message?.content ||
+        data.choices?.[0]?.message?.content ||
+        data.text ||
+        data.content ||
+        JSON.stringify(data)
+      );
+    }
+    return response ? String(response) : null;
+  } catch (error) {
+    console.warn("Puter AI no respondió; usando fallback Arkaios si está disponible.", error);
+    return null;
+  }
+}
+
+async function* yieldChunks(fullText: string) {
   const chunkSize = 240;
   for (let i = 0; i < fullText.length; i += chunkSize) {
     yield fullText.slice(i, i + chunkSize);
   }
-};
+}
