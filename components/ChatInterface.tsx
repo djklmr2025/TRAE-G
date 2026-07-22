@@ -42,6 +42,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return 'Arkaios';
   };
 
+  const getDraftSignal = (value: string) => {
+    const text = value.trim().toLowerCase();
+    if (!text) return "Borrador vivo local: listo. Nada se envia hasta presionar Enter.";
+    if (/(crea|crear|genera|generar|archivo|file|txt|tsx|jsx|html|css|json|py|js)/.test(text)) {
+      return "Borrador vivo local: posible creacion de archivo virtual.";
+    }
+    if (/(zip|descarga|exporta|github|repo|repositorio)/.test(text)) {
+      return "Borrador vivo local: posible exportacion o publicacion.";
+    }
+    if (/(powershell|terminal|cmd|wsl|comando|ejecuta)/.test(text)) {
+      return "Borrador vivo local: posible tarea de terminal local.";
+    }
+    return "Borrador vivo local: contexto preparado para Arkaios.";
+  };
+
   return (
     <div className="h-full flex flex-col bg-ide-sidebar border-r border-ide-border">
       {/* Header */}
@@ -165,7 +180,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </button>
         </form>
         <div className="mt-2 text-[10px] text-gray-600 text-center">
-          Arkaios puede equivocarse. Revisa el código antes de usarlo.
+          {getDraftSignal(input)}
         </div>
       </div>
     </div>

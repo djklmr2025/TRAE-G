@@ -33,11 +33,13 @@ Funciones disponibles:
 - Crear archivos virtuales desde la respuesta del agente.
 - Descargar el workspace virtual como `.zip`.
 - Publicar el workspace virtual en GitHub con autorización del usuario.
+- Detectar intención del borrador en modo local de navegador antes de enviar.
 
 Límite honesto:
 
 - La web no puede escribir directo en `C:\ARKAIOS` ni en carpetas reales de Windows.
 - Para archivos reales locales, usa la versión full/local portable.
+- El borrador vivo no envía texto a IA ni a internet antes de presionar Enter; solo muestra una señal local de intención.
 
 ### Publicar en GitHub
 

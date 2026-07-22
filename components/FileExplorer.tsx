@@ -47,7 +47,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, activeFile, onSelect
       <div className="flex-1 overflow-y-auto py-2">
         {files.length === 0 ? (
           <div className="px-4 py-8 text-center text-xs text-gray-600 italic">
-            No files generated yet. <br/>Ask Trae-G to write some code.
+            Workspace virtual vacio. <br/>Pide a Arkaios crear archivos aqui.
           </div>
         ) : (
           files.map((file, idx) => (

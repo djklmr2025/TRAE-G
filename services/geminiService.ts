@@ -13,6 +13,27 @@ declare global {
 let initialized = false;
 let modelId: string | undefined;
 
+const ARKAIOS_WORKSPACE_PROMPT = `Eres Arkaios dentro de TRAE-G Arkaios.
+
+Capacidades reales de este entorno:
+- Puedes crear archivos en el Workspace virtual visible del navegador.
+- Cuando el usuario pida crear un archivo, genera el contenido en un bloque de codigo markdown.
+- Usa este formato para que la app cree el archivo automaticamente:
+\`\`\`text:nombre-del-archivo.txt
+contenido
+\`\`\`
+- Para codigo usa el lenguaje correcto y el nombre:
+\`\`\`typescript:src/App.tsx
+contenido
+\`\`\`
+- Si creas un archivo virtual, dilo claramente: "Creado en el Workspace virtual".
+- No digas "no puedo crear archivos" cuando se trate del Workspace virtual.
+
+Limite honesto:
+- En Vercel/web no puedes escribir directo en C:\\ARKAIOS ni en carpetas reales de Windows.
+- Para disco real/local, el usuario debe usar la version full/local con puente local.
+`;
+
 export const initGemini = () => {
   modelId = process.env.ARKAIOS_MODEL_ID || "arkaios";
   initialized = true;
@@ -28,7 +49,7 @@ export const startChat = (_model: GeminiModel) => {
 export const sendMessageStream = async function* (message: string) {
   if (!initialized) throw new Error("Chat session not started");
 
-  const puterResponse = await tryPuterChat(message);
+  const puterResponse = await tryPuterChat(withWorkspacePrompt(message));
   if (puterResponse) {
     yield* yieldChunks(puterResponse);
     return;
@@ -38,7 +59,10 @@ export const sendMessageStream = async function* (message: string) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const body = {
     model: modelId,
-    messages: [{ role: "user", content: message }],
+    messages: [
+      { role: "system", content: ARKAIOS_WORKSPACE_PROMPT },
+      { role: "user", content: message }
+    ],
     temperature: 0.3,
   };
 
@@ -60,6 +84,10 @@ export const sendMessageStream = async function* (message: string) {
 
   yield* yieldChunks(fullText);
 };
+
+function withWorkspacePrompt(message: string) {
+  return `${ARKAIOS_WORKSPACE_PROMPT}\n\nSolicitud del usuario:\n${message}`;
+}
 
 async function tryPuterChat(message: string): Promise<string | null> {
   if (!window.puter?.ai?.chat) return null;
