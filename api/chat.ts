@@ -1,4 +1,4 @@
-const DEFAULT_ARKAIOS_BASE_URL = "https://arkaios-gateway-open.onrender.com";
+const DEFAULT_ARKAIOS_BASE_URL = "https://arkaios-service-proxy.onrender.com";
 const DEFAULT_MODEL_ID = "arkaios";
 
 type ChatMessage = {
@@ -27,10 +27,13 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.ARKAIOS_API_KEY || process.env.PROXY_API_KEY;
+  const apiKey =
+    process.env.TRAE_PROXY_API_KEY ||
+    process.env.PROXY_API_KEY ||
+    process.env.ARKAIOS_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: "ARKAIOS_API_KEY is not configured on the server",
+      error: "TRAE_PROXY_API_KEY or PROXY_API_KEY is not configured on the server",
     });
   }
 

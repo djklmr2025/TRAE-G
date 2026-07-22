@@ -47,14 +47,14 @@
    - Copy `.env.example` to `.env.local`
    - Add your Arkaios API keys:
      ```env
-     ARKAIOS_API_KEY=your_arkaios_api_key_here
-     ARKAIOS_BASE_URL=https://arkaios-gateway-open.onrender.com
+     TRAE_PROXY_API_KEY=your_proxy_api_key_here
+     ARKAIOS_BASE_URL=https://arkaios-service-proxy.onrender.com
      ARKAIOS_MODEL_ID=arkaios
      ```
 
-   In Vercel, set these as Project Environment Variables. `ARKAIOS_API_KEY`
+   In Vercel, set these as Project Environment Variables. `TRAE_PROXY_API_KEY`
    is used only by the serverless `/api/chat` proxy and is not exposed to the
-   browser bundle.
+   browser bundle. `PROXY_API_KEY` is also accepted as a compatible alias.
 
 4. **Run locally:**
    ```bash
