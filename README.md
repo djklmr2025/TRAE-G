@@ -6,6 +6,18 @@ TRAE-G Arkaios es una versión portable de escritorio para Windows con chat Arka
 
 La versión local real ya funciona como paquete portable.
 
+Versión portable recomendada actual:
+
+```text
+TRAE-G_Arkaios_Local_Real_v1.0.6.zip
+```
+
+Correcciones críticas de `v1.0.6`:
+
+- Corrige autoapertura/múltiples ventanas al iniciar el servidor local.
+- Desactiva la alerta `Old build detected` de Nativefier.
+- Activa instancia única para evitar aperturas duplicadas.
+
 Para instalar/usar desde GitHub Releases descarga el `.zip` completo del release, extráelo en una carpeta y ejecuta:
 
 ```text
