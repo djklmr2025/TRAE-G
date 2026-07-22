@@ -30,7 +30,7 @@ export const sendMessageStream = async function* (message: string) {
   const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Arkaios request failed: ${res.status} ${text}`);
+    throw new Error(`Arkaios no pudo responder: ${res.status} ${text}`);
   }
   data = await res.json();
 

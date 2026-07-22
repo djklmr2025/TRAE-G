@@ -1,10 +1,7 @@
-import React, { useState, useRef, useEffect, use } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Bot, User, Loader2, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Message, GeminiModel } from '../types';
-import { before } from 'node:test';
-import { type } from 'os';
-import { ref } from 'process';
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -42,10 +39,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const getModelName = (m: GeminiModel) => {
-    if (m === GeminiModel.FLASH) return 'Gemini 2.5 Flash';
-    if (m === GeminiModel.PRO) return 'Gemini 3.0 Pro';
-    if (m === GeminiModel.THINKING) return 'Gemini 2.5 (Thinking)';
-    return m;
+    return 'Arkaios';
   };
 
   return (
@@ -54,9 +48,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="p-4 border-b border-ide-border flex items-center justify-between">
         <div className="flex items-center gap-2">
            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-google-blue to-purple-500 flex items-center justify-center text-white font-bold text-xs">
-             TG
+             A
            </div>
-           <h1 className="font-semibold text-white tracking-tight">Trae-G</h1>
+           <h1 className="font-semibold text-white tracking-tight">Arkaios</h1>
         </div>
         
         <div className="relative">
@@ -70,7 +64,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           
           {showModelMenu && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-[#252529] border border-ide-border rounded-md shadow-xl z-50 overflow-hidden">
-              {Object.values(GeminiModel).map((model) => (
+              {[GeminiModel.FLASH].map((model) => (
                 <button
                   key={model}
                   onClick={() => {
@@ -93,8 +87,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-4 opacity-60">
             <Sparkles size={48} className="text-google-yellow" />
             <div>
-              <p className="text-sm font-medium text-gray-300">Welcome to Trae-G</p>
-              <p className="text-xs mt-1">Powered by Arkaios</p>
+              <p className="text-sm font-medium text-gray-300">Arkaios listo</p>
+              <p className="text-xs mt-1">IDE libre conectado al núcleo Arkaios</p>
             </div>
           </div>
         )}
@@ -130,7 +124,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </ReactMarkdown>
                   <div className="text-xs text-gray-500 mt-2 border-t border-gray-800 pt-2 flex gap-2 items-center">
                     <Sparkles size={10} className="text-google-blue" /> 
-                    <span>Trae-G generated content</span>
+                    <span>Arkaios generó contenido</span>
                   </div>
                 </div>
               )}
@@ -158,7 +152,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Trae to generate code..."
+            placeholder="Pide a Arkaios que genere, revise o explique código..."
             className="w-full bg-[#2B2D31] text-gray-200 text-sm rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-1 focus:ring-google-blue border border-transparent placeholder-gray-500"
             disabled={isLoading}
           />
@@ -171,7 +165,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </button>
         </form>
         <div className="mt-2 text-[10px] text-gray-600 text-center">
-          Gemini can make mistakes. Review code before use.
+          Arkaios puede equivocarse. Revisa el código antes de usarlo.
         </div>
       </div>
     </div>

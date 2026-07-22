@@ -14,9 +14,9 @@ export interface VirtualFile {
 }
 
 export enum GeminiModel {
-  FLASH = 'gemini-2.5-flash',
-  PRO = 'gemini-3-pro-preview',
-  THINKING = 'gemini-2.5-flash-thinking' // Custom alias for handling thinking config
+  FLASH = 'arkaios',
+  PRO = 'arkaios',
+  THINKING = 'arkaios'
 }
 
 export interface ChatState {

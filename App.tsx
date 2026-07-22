@@ -85,7 +85,7 @@ function App() {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'model',
-        content: "Sorry, I encountered an error processing your request. Please check the console or your API Key.",
+        content: "Arkaios no pudo responder desde el servidor. Revisa que el proxy esté activo y que Vercel tenga TRAE_PROXY_API_KEY configurada.",
         timestamp: Date.now()
       }]);
     } finally {
@@ -109,9 +109,9 @@ function App() {
         <div className="p-3 bg-ide-sidebar border-b border-ide-border flex justify-between items-center shadow-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="font-bold text-blue-400 tracking-wider">TRAE-G</span>
+            <span className="font-bold text-blue-400 tracking-wider">ARKAIOS</span>
           </div>
-          <span className="text-xs text-gray-400 font-mono border border-gray-700 px-2 py-0.5 rounded">Arkaios Core</span>
+          <span className="text-xs text-gray-400 font-mono border border-gray-700 px-2 py-0.5 rounded">Local/Web Core</span>
         </div>
         <ChatInterface
           messages={messages}
