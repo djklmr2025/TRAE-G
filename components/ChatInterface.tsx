@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Bot, User, Loader2, ChevronDown } from 'lucide-react';
+import { Download, Send, Sparkles, Bot, User, Loader2, ChevronDown, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Message, GeminiModel } from '../types';
 
@@ -9,6 +9,8 @@ interface ChatInterfaceProps {
   currentModel: GeminiModel;
   onSendMessage: (text: string) => void;
   onModelChange: (model: GeminiModel) => void;
+  onDownloadLog: () => void;
+  onClearMemory: () => void;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
@@ -16,7 +18,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isLoading, 
   currentModel, 
   onSendMessage,
-  onModelChange
+  onModelChange,
+  onDownloadLog,
+  onClearMemory
 }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,6 +72,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
            <h1 className="font-semibold text-white tracking-tight">Arkaios</h1>
         </div>
         
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onDownloadLog}
+            className="p-1.5 rounded border border-ide-border text-gray-400 hover:text-white hover:border-google-blue"
+            title="Descargar log de chat"
+          >
+            <Download size={13} />
+          </button>
+          <button
+            onClick={onClearMemory}
+            className="p-1.5 rounded border border-ide-border text-gray-400 hover:text-white hover:border-red-500"
+            title="Borrar memoria local"
+          >
+            <Trash2 size={13} />
+          </button>
         <div className="relative">
           <button 
             onClick={() => setShowModelMenu(!showModelMenu)}
@@ -93,6 +112,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
 

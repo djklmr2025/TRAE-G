@@ -6,6 +6,7 @@ import CodeEditor from './components/CodeEditor';
 import TerminalPanel from './components/TerminalPanel';
 import { initGemini, startChat, sendMessageStream } from './services/geminiService';
 import { downloadWorkspaceZip, publishWorkspaceToGitHub } from './services/workspaceExport';
+import { buildMemoryContext, clearMemory, downloadChatLog, loadMessages, saveMessages, saveRemoteMemory, searchRemoteMemory } from './services/memoryService';
 import { parseCodeToFiles } from './utils/codeParser';
 
 function App() {
@@ -16,6 +17,18 @@ function App() {
   const [activeFile, setActiveFile] = useState<VirtualFile | null>(null);
   const [currentModel, setCurrentModel] = useState<GeminiModel>(GeminiModel.FLASH);
   const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const restored = loadMessages();
+    if (restored.length > 0) {
+      setMessages(restored);
+      setHasStarted(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    saveMessages(messages);
+  }, [messages]);
 
   // Initialize Chat
   useEffect(() => {
@@ -41,7 +54,9 @@ function App() {
     setMessages(prev => [...prev, userMsg]);
 
     try {
-      const stream = sendMessageStream(text);
+      const localMemory = buildMemoryContext([...messages, userMsg]);
+      const remoteMemory = await searchRemoteMemory(text);
+      const stream = sendMessageStream(text, [localMemory, remoteMemory ? `Memoria remota Supermemory:\n${remoteMemory}` : ""].filter(Boolean).join("\n\n"));
 
       const botMsgId = (Date.now() + 1).toString();
       let fullContent = '';
@@ -82,6 +97,7 @@ function App() {
           }
         }
       }
+      await saveRemoteMemory(text, fullContent);
     } catch (error) {
       console.error("Chat error:", error);
       setMessages(prev => [...prev, {
@@ -98,9 +114,6 @@ function App() {
 
   const handleModelChange = (model: GeminiModel) => {
     setCurrentModel(model);
-    setMessages([]); // Clear history on model switch for simplicity
-    setFiles([]);
-    setActiveFile(null);
     startChat(model);
   };
 
@@ -134,6 +147,18 @@ function App() {
     }
   };
 
+  const handleDownloadLog = () => {
+    downloadChatLog(messages, files);
+  };
+
+  const handleClearMemory = () => {
+    clearMemory();
+    setMessages([]);
+    setFiles([]);
+    setActiveFile(null);
+    setHasStarted(false);
+  };
+
   return (
     <div className="flex h-screen w-screen bg-ide-bg text-ide-text font-sans overflow-hidden">
       {/* Left: Chat Sidebar (Width 350px fixed for now) */}
@@ -151,6 +176,8 @@ function App() {
           currentModel={currentModel}
           onSendMessage={handleSendMessage}
           onModelChange={handleModelChange}
+          onDownloadLog={handleDownloadLog}
+          onClearMemory={handleClearMemory}
         />
       </div>
 

@@ -37,6 +37,9 @@ function loadRootKeyFile(filePath) {
     if (key === "PROXY_API_KEY" && !process.env.TRAE_PROXY_API_KEY) {
       process.env.TRAE_PROXY_API_KEY = value;
     }
+    if ((key === "SUPERMEMORY_API_KEY" || key === "VITE_SUPERMEMORY_API_KEY") && !process.env.SUPERMEMORY_API_KEY) {
+      process.env.SUPERMEMORY_API_KEY = value;
+    }
     if (key === "TRAE_PROXY_BASE_URL" && !process.env.TRAE_PROXY_BASE_URL) {
       process.env.TRAE_PROXY_BASE_URL = value;
     }
@@ -128,6 +131,69 @@ async function handleTerminal(req, res) {
   });
 }
 
+function extractMemoryContext(data) {
+  const items = data?.results || data?.documents || data?.memories || data?.data || [];
+  if (!Array.isArray(items)) return "";
+  return items
+    .slice(0, 6)
+    .map((item) => item?.content || item?.document?.content || item?.text || item?.summary || "")
+    .filter(Boolean)
+    .join("\n---\n");
+}
+
+async function handleMemory(req, res) {
+  const body = await readJson(req);
+  const apiKey = process.env.SUPERMEMORY_API_KEY || process.env.VITE_SUPERMEMORY_API_KEY;
+  if (!apiKey) return sendJson(res, 200, { ok: false, disabled: true, context: "" });
+
+  const baseUrl = String(process.env.SUPERMEMORY_BASE_URL || "https://api.supermemory.ai").replace(/\/+$/, "");
+  const action = String(body.action || "");
+  const sessionId = String(body.sessionId || "arkaios-local");
+
+  if (action === "add") {
+    const content = String(body.content || "").trim();
+    if (!content) return sendJson(res, 400, { error: "Missing content" });
+
+    const upstream = await fetch(`${baseUrl}/v3/documents`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content,
+        containerTag: sessionId,
+        metadata: { app: "TRAE-G Arkaios", sessionId, source: "arkaios-chat-local" },
+      }),
+    });
+    const text = await upstream.text();
+    res.writeHead(upstream.ok ? 200 : upstream.status, { "Content-Type": upstream.headers.get("content-type") || "application/json" });
+    return res.end(text || JSON.stringify({ ok: upstream.ok }));
+  }
+
+  if (action === "search") {
+    const query = String(body.query || "").trim();
+    if (!query) return sendJson(res, 200, { ok: true, context: "" });
+
+    const upstream = await fetch(`${baseUrl}/v3/search`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ q: query, containerTag: sessionId, limit: 6 }),
+    });
+    const data = await upstream.json().catch(() => ({}));
+    return sendJson(res, upstream.ok ? 200 : upstream.status, {
+      ok: upstream.ok,
+      context: upstream.ok ? extractMemoryContext(data) : "",
+      raw: upstream.ok ? undefined : data,
+    });
+  }
+
+  return sendJson(res, 400, { error: "Invalid action" });
+}
+
 function serveStatic(req, res) {
   const requestUrl = new URL(req.url || "/", `http://127.0.0.1:${port}`);
   const rawPath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
@@ -153,6 +219,7 @@ function serveStatic(req, res) {
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method === "POST" && req.url === "/api/chat") return await handleChat(req, res);
+    if (req.method === "POST" && req.url === "/api/memory") return await handleMemory(req, res);
     if (req.method === "POST" && req.url === "/api/terminal/run") return await handleTerminal(req, res);
     if (req.method === "GET") return serveStatic(req, res);
     return sendJson(res, 405, { error: "Método no permitido" });

@@ -46,10 +46,10 @@ export const startChat = (_model: GeminiModel) => {
   return { modelId };
 };
 
-export const sendMessageStream = async function* (message: string) {
+export const sendMessageStream = async function* (message: string, memoryContext = "") {
   if (!initialized) throw new Error("Chat session not started");
 
-  const puterResponse = await tryPuterChat(withWorkspacePrompt(message));
+  const puterResponse = await tryPuterChat(withWorkspacePrompt(message, memoryContext));
   if (puterResponse) {
     yield* yieldChunks(puterResponse);
     return;
@@ -57,12 +57,14 @@ export const sendMessageStream = async function* (message: string) {
 
   const url = `/api/chat`;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const messages = [
+    { role: "system", content: ARKAIOS_WORKSPACE_PROMPT },
+    ...(memoryContext ? [{ role: "system", content: `Memoria disponible:\n${memoryContext}` }] : []),
+    { role: "user", content: message }
+  ];
   const body = {
     model: modelId,
-    messages: [
-      { role: "system", content: ARKAIOS_WORKSPACE_PROMPT },
-      { role: "user", content: message }
-    ],
+    messages,
     temperature: 0.3,
   };
 
@@ -85,8 +87,8 @@ export const sendMessageStream = async function* (message: string) {
   yield* yieldChunks(fullText);
 };
 
-function withWorkspacePrompt(message: string) {
-  return `${ARKAIOS_WORKSPACE_PROMPT}\n\nSolicitud del usuario:\n${message}`;
+function withWorkspacePrompt(message: string, memoryContext = "") {
+  return `${ARKAIOS_WORKSPACE_PROMPT}${memoryContext ? `\n\nMemoria disponible:\n${memoryContext}` : ""}\n\nSolicitud del usuario:\n${message}`;
 }
 
 async function tryPuterChat(message: string): Promise<string | null> {

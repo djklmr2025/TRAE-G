@@ -34,12 +34,32 @@ Funciones disponibles:
 - Descargar el workspace virtual como `.zip`.
 - Publicar el workspace virtual en GitHub con autorización del usuario.
 - Detectar intención del borrador en modo local de navegador antes de enviar.
+- Guardar sesión de chat por usuario/navegador.
+- Descargar `.log` de la conversación e interacciones.
+- Usar memoria corta/larga local y memoria remota opcional.
 
 Límite honesto:
 
 - La web no puede escribir directo en `C:\ARKAIOS` ni en carpetas reales de Windows.
 - Para archivos reales locales, usa la versión full/local portable.
 - El borrador vivo no envía texto a IA ni a internet antes de presionar Enter; solo muestra una señal local de intención.
+
+## Memoria
+
+TRAE-G Arkaios guarda memoria de sesión en el navegador:
+
+- `arkaios_session_id`: identifica la sesión local.
+- `arkaios_chat_messages`: historial corto persistente.
+- `arkaios_long_memory`: resumen local de preferencias e interacciones relevantes.
+
+El botón de descarga del chat exporta un `.log` con:
+
+- ID de sesión.
+- Memoria local.
+- Conversación.
+- Lista de archivos virtuales del workspace.
+
+Si el servidor tiene `SUPERMEMORY_API_KEY` o `VITE_SUPERMEMORY_API_KEY`, también puede sincronizar memoria remota mediante `/api/memory`. La llave se usa del lado servidor/local y no se imprime en la UI.
 
 ### Publicar en GitHub
 
