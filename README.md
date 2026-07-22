@@ -66,6 +66,24 @@
    npm run build:exe
    ```
 
+### Local Arkaios mode
+
+For local terminal access, run:
+
+```bash
+npm run local
+```
+
+or on Windows:
+
+```bat
+ARRANCAR_ARKAIOS_LOCAL.cmd
+```
+
+This opens Arkaios on `http://127.0.0.1:8787` and enables the local
+PowerShell/WSL terminal bridge. The terminal bridge is intentionally local-only;
+it is not available on the public Vercel deployment.
+
 ---
 
 ## 🛠️ Configuration

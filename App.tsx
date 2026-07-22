@@ -3,6 +3,7 @@ import { Message, VirtualFile, GeminiModel } from './types';
 import ChatInterface from './components/ChatInterface';
 import FileExplorer from './components/FileExplorer';
 import CodeEditor from './components/CodeEditor';
+import TerminalPanel from './components/TerminalPanel';
 import { initGemini, startChat, sendMessageStream } from './services/geminiService';
 import { parseCodeToFiles } from './utils/codeParser';
 
@@ -132,8 +133,13 @@ function App() {
       </div>
 
       {/* Right: Editor Workspace */}
-      <div className="flex-1 h-full min-w-0 bg-[#1E1E1E]">
-        <CodeEditor file={activeFile} />
+      <div className="flex-1 h-full min-w-0 bg-[#1E1E1E] flex flex-col">
+        <div className="flex-1 min-h-0">
+          <CodeEditor file={activeFile} />
+        </div>
+        <div className="h-[34%] min-h-[220px]">
+          <TerminalPanel />
+        </div>
       </div>
     </div>
   );
