@@ -6,12 +6,13 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, "..");
-const distDir = path.join(rootDir, "dist");
+const rootDir = process.env.ARKAIOS_APP_ROOT || path.resolve(__dirname, "..");
+const distDir = process.env.ARKAIOS_STATIC_DIR || path.join(rootDir, "dist");
 const workspaceDir = process.env.ARKAIOS_WORKSPACE || "C:\\ARKAIOS";
 const port = Number(process.env.ARKAIOS_LOCAL_PORT || 8787);
 
 loadDotEnv(path.join(rootDir, ".env.local"));
+loadRootKeyFile("C:\\Ruta\\API KEY ROOT.txt");
 
 function loadDotEnv(filePath) {
   if (!fs.existsSync(filePath)) return;
@@ -22,6 +23,23 @@ function loadDotEnv(filePath) {
     const key = match[1];
     const value = match[2].replace(/^["']|["']$/g, "");
     if (!process.env[key]) process.env[key] = value;
+  }
+}
+
+function loadRootKeyFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/);
+  for (const line of lines) {
+    const match = line.match(/^\s*([^#=\s]+)\s*=\s*(.*)\s*$/);
+    if (!match) continue;
+    const key = match[1];
+    const value = match[2].replace(/^["']|["']$/g, "");
+    if (key === "PROXY_API_KEY" && !process.env.TRAE_PROXY_API_KEY) {
+      process.env.TRAE_PROXY_API_KEY = value;
+    }
+    if (key === "TRAE_PROXY_BASE_URL" && !process.env.TRAE_PROXY_BASE_URL) {
+      process.env.TRAE_PROXY_BASE_URL = value;
+    }
   }
 }
 
@@ -53,7 +71,7 @@ function readJson(req) {
 async function handleChat(req, res) {
   const body = await readJson(req);
   const apiKey = process.env.TRAE_PROXY_API_KEY || process.env.PROXY_API_KEY || process.env.ARKAIOS_API_KEY;
-  const baseUrl = (process.env.ARKAIOS_BASE_URL || "https://arkaios-service-proxy.onrender.com").replace(/\/+$/, "");
+  const baseUrl = normalizeChatBaseUrl(process.env.TRAE_PROXY_BASE_URL || "https://arkaios-service-proxy.onrender.com");
 
   if (!apiKey) return sendJson(res, 500, { error: "Falta TRAE_PROXY_API_KEY/PROXY_API_KEY local" });
 
@@ -73,6 +91,14 @@ async function handleChat(req, res) {
   const text = await upstream.text();
   res.writeHead(upstream.status, { "Content-Type": upstream.headers.get("content-type") || "application/json" });
   res.end(text);
+}
+
+function normalizeChatBaseUrl(value) {
+  const baseUrl = String(value || "").replace(/\/+$/, "");
+  if (!baseUrl || baseUrl.includes("arkaios-gateway-open.onrender.com")) {
+    return "https://arkaios-service-proxy.onrender.com";
+  }
+  return baseUrl;
 }
 
 async function handleTerminal(req, res) {
