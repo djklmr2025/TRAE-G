@@ -1,9 +1,10 @@
 param(
-  [string]$InstallDir = "$env:USERPROFILE\ArkaiosLab",
-  [string]$ManifestUrl = "https://raw.githubusercontent.com/djklmr2025/TRAE-G/main/arkaios-manifest.json",
-  [switch]$SkipBuild,
+  [string]$InstallDir = "C:\ARKAIOS",
+  [string]$ArchiveUrl = "https://github.com/djklmr2025/TRAE-G/releases/download/2026/ARKAIOS_FULL_LOCAL_v1.0.1_FINAL_20260722-214629_SOLID.rar",
+  [string]$ExpectedSha256 = "A6E1A6BF148D84ADA03E935352AE32AACB0EC02DD7C3DB3974DF71F99F601683",
+  [string]$LocalArchive = "",
   [switch]$Launch,
-  [switch]$AdminMode
+  [switch]$KeepTemp
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,127 +14,126 @@ function Write-Step([string]$Message) {
   Write-Host "==> $Message" -ForegroundColor Cyan
 }
 
-function Test-Command([string]$Name) {
-  return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
-}
+function Find-RarTool {
+  $candidates = @(
+    "C:\Program Files\WinRAR\Rar.exe",
+    "C:\Program Files\WinRAR\WinRAR.exe",
+    "C:\Program Files (x86)\WinRAR\Rar.exe",
+    "C:\Program Files (x86)\WinRAR\WinRAR.exe"
+  )
 
-function Resolve-TemplatePath([string]$Value) {
-  return $Value.Replace("%USERPROFILE%", $env:USERPROFILE)
-}
-
-function Invoke-SafeGitCloneOrPull([string]$Url, [string]$Target) {
-  if ($Url.StartsWith("local:", [System.StringComparison]::OrdinalIgnoreCase)) {
-    $source = $Url.Substring(6)
-    if (-not (Test-Path -LiteralPath $source)) {
-      Write-Host "Origen local no existe: $source" -ForegroundColor Yellow
-      return
+  foreach ($candidate in $candidates) {
+    if (Test-Path -LiteralPath $candidate) {
+      return @{ Tool = $candidate; Kind = "rar" }
     }
-
-    if (-not (Test-Path -LiteralPath $Target)) {
-      New-Item -ItemType Directory -Path $Target -Force | Out-Null
-    }
-
-    Write-Host "Sincronizando módulo local: $source -> $Target"
-    Copy-Item -Path (Join-Path $source "*") -Destination $Target -Recurse -Force
-    return
   }
 
-  if (Test-Path -LiteralPath (Join-Path $Target ".git")) {
-    Write-Host "Actualizando: $Target"
-    git -C $Target pull --ff-only
-    return
+  $sevenZip = Get-Command 7z.exe -ErrorAction SilentlyContinue
+  if ($sevenZip) {
+    return @{ Tool = $sevenZip.Source; Kind = "7z" }
   }
 
-  if (Test-Path -LiteralPath $Target) {
-    Write-Host "Existe carpeta sin .git, se conserva: $Target" -ForegroundColor Yellow
-    return
-  }
-
-  Write-Host "Clonando: $Url"
-  git clone $Url $Target
+  return $null
 }
 
-if ($AdminMode) {
-  $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-  if (-not $isAdmin) {
-    throw "AdminMode fue solicitado, pero PowerShell no está elevado. Abre PowerShell como Administrador y vuelve a ejecutar."
-  }
-  Write-Host "AdminMode activo. Las acciones se registran y no se ejecutan borrados destructivos." -ForegroundColor Yellow
-}
+function Expand-RarArchive([string]$Archive, [string]$Destination, [hashtable]$Extractor) {
+  New-Item -ItemType Directory -Force -Path $Destination | Out-Null
 
-Write-Host "=== Arkaios Sovereign Lab Bootstrapper ===" -ForegroundColor Green
-Write-Host "Instalación destino: $InstallDir"
-
-if (-not (Test-Command git)) { throw "Falta Git. Instala Git y vuelve a ejecutar." }
-if (-not (Test-Command node)) { throw "Falta Node.js. Instala Node.js 20+ y vuelve a ejecutar." }
-if (-not (Test-Command npm)) { throw "Falta npm. Instala Node.js completo y vuelve a ejecutar." }
-
-New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-$logPath = Join-Path $InstallDir "arkaios-install.log"
-"[$(Get-Date -Format o)] Bootstrap iniciado en $InstallDir" | Out-File -LiteralPath $logPath -Encoding UTF8 -Append
-
-Write-Step "Cargando manifest"
-$manifestFile = Join-Path $InstallDir "arkaios-manifest.json"
-try {
-  Invoke-RestMethod -Uri $ManifestUrl -OutFile $manifestFile
-} catch {
-  $localManifest = Join-Path $PSScriptRoot "arkaios-manifest.json"
-  if (Test-Path -LiteralPath $localManifest) {
-    Copy-Item -LiteralPath $localManifest -Destination $manifestFile -Force
+  if ($Extractor.Kind -eq "rar") {
+    & $Extractor.Tool x -y $Archive $Destination | Out-Null
+  } elseif ($Extractor.Kind -eq "7z") {
+    & $Extractor.Tool x "-o$Destination" -y $Archive | Out-Null
   } else {
-    throw "No se pudo descargar manifest y no existe manifest local."
+    throw "Extractor no soportado: $($Extractor.Kind)"
+  }
+
+  if ($LASTEXITCODE -ne 0) {
+    throw "No se pudo extraer el RAR. Codigo: $LASTEXITCODE"
   }
 }
 
-$manifest = Get-Content -LiteralPath $manifestFile -Raw | ConvertFrom-Json
+function Copy-Merge([string]$Source, [string]$Destination) {
+  if (!(Test-Path -LiteralPath $Source)) {
+    throw "Fuente no existe: $Source"
+  }
 
-Write-Step "Instalando/actualizando repos"
-foreach ($repo in $manifest.repos) {
-  $target = Join-Path $InstallDir $repo.path
-  try {
-    Invoke-SafeGitCloneOrPull -Url $repo.url -Target $target
-    "[$(Get-Date -Format o)] Repo OK: $($repo.id) -> $target" | Out-File -LiteralPath $logPath -Encoding UTF8 -Append
-  } catch {
-    "[$(Get-Date -Format o)] Repo ERROR: $($repo.id) -> $($_.Exception.Message)" | Out-File -LiteralPath $logPath -Encoding UTF8 -Append
-    if ($repo.required) { throw }
-    Write-Host "No se pudo preparar repo opcional $($repo.id): $($_.Exception.Message)" -ForegroundColor Yellow
+  New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+  robocopy $Source $Destination /E /NFL /NDL /NJH /NJS /NC /NS /NP | Out-Null
+  $code = $LASTEXITCODE
+  if ($code -gt 7) {
+    throw "Robocopy fallo de $Source a $Destination con codigo $code"
   }
 }
 
-if (-not $SkipBuild) {
-  Write-Step "Instalando dependencias y compilando LAB principal"
-  $mainLab = Join-Path $InstallDir "TRAE-G"
-  if (Test-Path -LiteralPath (Join-Path $mainLab "package.json")) {
-    npm --prefix $mainLab install
-    npm --prefix $mainLab run build
-  }
+Write-Host "=== ARKAIOS FULL LOCAL Installer ===" -ForegroundColor Green
+Write-Host "Destino: $InstallDir"
+
+$extractor = Find-RarTool
+if (!$extractor) {
+  throw "Falta WinRAR o 7-Zip. Instala uno de los dos y vuelve a ejecutar."
 }
+Write-Host "Extractor: $($extractor.Tool)"
 
-Write-Step "Creando lanzadores locales"
-$launcher = Join-Path $InstallDir "ARKAIOS_LAB_LOCAL.cmd"
-Set-Content -LiteralPath $launcher -Encoding ASCII -Value @"
-@echo off
-setlocal
-cd /d "%~dp0TRAE-G"
-set ARKAIOS_WORKSPACE=%~dp0
-npm run local
-"@
+$tempRoot = Join-Path $env:TEMP ("arkaios-full-local-" + [Guid]::NewGuid().ToString("N"))
+$downloadPath = Join-Path $tempRoot "ARKAIOS_FULL_LOCAL_v1.0.1_FINAL.rar"
+$extractPath = Join-Path $tempRoot "extract"
 
-$openFolder = Join-Path $InstallDir "ABRIR_CARPETA_ARKAIOS.cmd"
-Set-Content -LiteralPath $openFolder -Encoding ASCII -Value @"
-@echo off
-explorer "%~dp0"
-"@
+New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
 
-Write-Step "Resultado"
-Write-Host "Instalado en: $InstallDir" -ForegroundColor Green
-Write-Host "Lanzador: $launcher"
-Write-Host "Log: $logPath"
-Write-Host ""
-Write-Host "Para ejecutar después:"
-Write-Host "  $launcher"
+try {
+  if ($LocalArchive) {
+    Write-Step "Usando paquete local"
+    if (!(Test-Path -LiteralPath $LocalArchive)) {
+      throw "No existe LocalArchive: $LocalArchive"
+    }
+    Copy-Item -LiteralPath $LocalArchive -Destination $downloadPath -Force
+  } else {
+    Write-Step "Descargando paquete oficial"
+    Write-Host $ArchiveUrl
+    Invoke-WebRequest -Uri $ArchiveUrl -OutFile $downloadPath
+  }
 
-if ($Launch) {
-  Write-Step "Lanzando Arkaios LAB local"
-  Start-Process -FilePath $launcher -WorkingDirectory $InstallDir
+  Write-Step "Validando SHA256"
+  $actualSha256 = (Get-FileHash -LiteralPath $downloadPath -Algorithm SHA256).Hash.ToUpperInvariant()
+  if ($actualSha256 -ne $ExpectedSha256.ToUpperInvariant()) {
+    throw "SHA256 invalido. Esperado $ExpectedSha256 pero se obtuvo $actualSha256"
+  }
+  Write-Host "SHA256 OK: $actualSha256" -ForegroundColor Green
+
+  Write-Step "Extrayendo paquete"
+  Expand-RarArchive -Archive $downloadPath -Destination $extractPath -Extractor $extractor
+
+  $payload = Get-ChildItem -LiteralPath $extractPath -Directory |
+    Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName "arkaios-neural-agent-main") } |
+    Select-Object -First 1
+
+  if (!$payload) {
+    throw "El paquete no contiene arkaios-neural-agent-main en la raiz esperada."
+  }
+
+  Write-Step "Instalando modulos en $InstallDir"
+  Copy-Merge -Source (Join-Path $payload.FullName "arkaios-neural-agent-main") -Destination (Join-Path $InstallDir "arkaios-neural-agent-main")
+  Copy-Merge -Source (Join-Path $payload.FullName "ELEMIA-v4-arkaios-main") -Destination (Join-Path $InstallDir "ELEMIA-v4-arkaios-main")
+  Copy-Merge -Source (Join-Path $payload.FullName "puter-internetOS") -Destination (Join-Path $InstallDir "puter-internetOS")
+
+  $launcher = Join-Path $InstallDir "arkaios-neural-agent-main\ARRANCAR_ARKAIOS_FULL_LOCAL.bat"
+  if (!(Test-Path -LiteralPath $launcher)) {
+    throw "No se encontro lanzador final: $launcher"
+  }
+
+  Write-Step "Instalacion lista"
+  Write-Host "Lanzador: $launcher" -ForegroundColor Green
+  Write-Host "Backend: http://127.0.0.1:8000"
+  Write-Host "Eyes/Hands: http://127.0.0.1:8001"
+  Write-Host "Puter OS: http://puter.localhost:4100"
+  Write-Host "App: http://puter.localhost:4100/app/arkaios"
+
+  if ($Launch) {
+    Write-Step "Ejecutando ARKAIOS FULL LOCAL"
+    Start-Process -FilePath $launcher -WorkingDirectory (Split-Path -Parent $launcher)
+  }
+} finally {
+  if (!$KeepTemp -and (Test-Path -LiteralPath $tempRoot)) {
+    Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
+  }
 }
