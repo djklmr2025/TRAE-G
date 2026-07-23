@@ -9,14 +9,8 @@ La versión local real ya funciona como paquete portable.
 Versión portable recomendada actual:
 
 ```text
-TRAE-G_Arkaios_Local_Real_v1.0.6.zip
+TRAE-G_Arkaios_Local_Real_v1.0.7.zip
 ```
-
-Correcciones críticas de `v1.0.6`:
-
-- Corrige autoapertura/múltiples ventanas al iniciar el servidor local.
-- Desactiva la alerta `Old build detected` de Nativefier.
-- Activa instancia única para evitar aperturas duplicadas.
 
 Para instalar/usar desde GitHub Releases descarga el `.zip` completo del release, extráelo en una carpeta y ejecuta:
 
@@ -99,7 +93,16 @@ Ese servidor sirve la UI compilada desde:
 resources/app/dist
 ```
 
-También expone el puente local de terminal para PowerShell/WSL desde la interfaz.
+También expone el puente local de terminal desde la interfaz.
+
+Funciones locales reales:
+
+- `Add Folder`: selecciona una carpeta real de Windows como workspace activo.
+- Terminal PowerShell: ejecuta comandos en el workspace activo.
+- Terminal WSL/Linux: ejecuta `wsl.exe bash -lc` en el workspace activo.
+- Terminal Termux/ADB: ejecuta `adb.exe shell` para dispositivos Android autorizados.
+
+Nota de seguridad: el modo administrador/root no se ejecuta oculto ni automático. Si se agrega como fase avanzada, debe quedar con confirmación explícita, registro de acciones y alcance visible para el usuario.
 
 ## Ejecutar desde código fuente
 

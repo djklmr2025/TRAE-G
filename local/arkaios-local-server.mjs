@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = process.env.ARKAIOS_APP_ROOT || path.resolve(__dirname, "..");
 const distDir = process.env.ARKAIOS_STATIC_DIR || path.join(rootDir, "dist");
-const workspaceDir = process.env.ARKAIOS_WORKSPACE || "C:\\ARKAIOS";
+let workspaceDir = process.env.ARKAIOS_WORKSPACE || "C:\\ARKAIOS";
 const port = Number(process.env.ARKAIOS_LOCAL_PORT || 8787);
 
 loadDotEnv(path.join(rootDir, ".env.local"));
@@ -106,13 +106,19 @@ function normalizeChatBaseUrl(value) {
 
 async function handleTerminal(req, res) {
   const body = await readJson(req);
-  const shell = body.shell === "wsl" ? "wsl" : "powershell";
+  const shell = body.shell === "wsl" ? "wsl" : body.shell === "termux" ? "termux" : "powershell";
   const command = String(body.command || "").trim();
 
   if (!command) return sendJson(res, 400, { error: "Comando vacío" });
 
+  if (!fs.existsSync(workspaceDir) || !fs.statSync(workspaceDir).isDirectory()) {
+    return sendJson(res, 400, { error: `Workspace no existe: ${workspaceDir}` });
+  }
+
   const child = shell === "wsl"
     ? spawn("wsl.exe", ["bash", "-lc", command], { cwd: workspaceDir, windowsHide: true })
+    : shell === "termux"
+      ? spawn("adb.exe", ["shell", command], { cwd: workspaceDir, windowsHide: true })
     : spawn("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command], { cwd: workspaceDir, windowsHide: true });
 
   let stdout = "";
@@ -129,6 +135,34 @@ async function handleTerminal(req, res) {
     clearTimeout(timer);
     sendJson(res, 500, { ok: false, shell, cwd: workspaceDir, stdout, stderr: error.message, code: null });
   });
+}
+
+async function handleWorkspace(req, res) {
+  const requestUrl = new URL(req.url || "/", `http://127.0.0.1:${port}`);
+
+  if (req.method === "GET" && requestUrl.pathname === "/api/workspace/status") {
+    return sendJson(res, 200, {
+      ok: true,
+      local: true,
+      workspaceDir,
+      exists: fs.existsSync(workspaceDir) && fs.statSync(workspaceDir).isDirectory(),
+    });
+  }
+
+  if (req.method === "POST" && requestUrl.pathname === "/api/workspace/set") {
+    const body = await readJson(req);
+    const requested = String(body.path || "").trim().replace(/^["']|["']$/g, "");
+    if (!requested) return sendJson(res, 400, { error: "Ruta vacía" });
+
+    const resolved = path.resolve(requested);
+    if (!fs.existsSync(resolved)) return sendJson(res, 404, { error: `La carpeta no existe: ${resolved}` });
+    if (!fs.statSync(resolved).isDirectory()) return sendJson(res, 400, { error: `No es carpeta: ${resolved}` });
+
+    workspaceDir = resolved;
+    return sendJson(res, 200, { ok: true, local: true, workspaceDir, exists: true });
+  }
+
+  return sendJson(res, 404, { error: "Workspace endpoint no encontrado" });
 }
 
 function extractMemoryContext(data) {
@@ -221,6 +255,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/api/chat") return await handleChat(req, res);
     if (req.method === "POST" && req.url === "/api/memory") return await handleMemory(req, res);
     if (req.method === "POST" && req.url === "/api/terminal/run") return await handleTerminal(req, res);
+    if (req.url?.startsWith("/api/workspace/")) return await handleWorkspace(req, res);
     if (req.method === "GET") return serveStatic(req, res);
     return sendJson(res, 405, { error: "Método no permitido" });
   } catch (error) {

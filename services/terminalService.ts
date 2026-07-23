@@ -1,4 +1,4 @@
-export type LocalShell = "powershell" | "wsl";
+export type LocalShell = "powershell" | "wsl" | "termux";
 
 export type TerminalRunResult = {
   ok: boolean;

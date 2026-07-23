@@ -1,12 +1,38 @@
-import React, { useState } from "react";
-import { Terminal, Play, Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Terminal, Play, Loader2, FolderPlus } from "lucide-react";
 import { LocalShell, runLocalTerminal } from "../services/terminalService";
+import { getWorkspaceStatus, setWorkspaceFolder } from "../services/workspaceService";
 
 const TerminalPanel: React.FC = () => {
   const [shell, setShell] = useState<LocalShell>("powershell");
   const [command, setCommand] = useState("pwd");
-  const [output, setOutput] = useState("Terminal local Arkaios lista.\nUsa PowerShell o WSL/Linux cuando abras la app local.");
+  const [workspaceDir, setWorkspaceDir] = useState("C:\\ARKAIOS");
+  const [output, setOutput] = useState("Terminal local Arkaios lista.\nUsa PowerShell, WSL/Linux o Termux/ADB cuando abras la app local.");
   const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    getWorkspaceStatus()
+      .then((status) => {
+        setWorkspaceDir(status.workspaceDir);
+        setOutput(`Terminal local Arkaios lista.\nWorkspace activo: ${status.workspaceDir}\nShells: PowerShell / WSL-Linux / Termux-ADB.`);
+      })
+      .catch(() => {
+        setOutput("Terminal local no conectada.\nAbre TRAE-G.exe local; en Vercel no se puede tocar tu disco ni tu terminal real.");
+      });
+  }, []);
+
+  const addFolderToWorkspace = async () => {
+    const selected = window.prompt("Ruta local del workspace:", workspaceDir || "C:\\ARKAIOS");
+    if (!selected) return;
+
+    try {
+      const status = await setWorkspaceFolder(selected);
+      setWorkspaceDir(status.workspaceDir);
+      setOutput((prev) => `${prev}\n\n[workspace] Carpeta activa: ${status.workspaceDir}`);
+    } catch (error) {
+      setOutput((prev) => `${prev}\n\n[workspace] ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
 
   const execute = async () => {
     const clean = command.trim();
@@ -36,15 +62,27 @@ const TerminalPanel: React.FC = () => {
         <div className="flex items-center gap-2 text-sm text-gray-200">
           <Terminal size={15} className="text-green-400" />
           <span>Terminal Local Arkaios</span>
+          <span className="hidden md:inline text-[11px] text-gray-500 truncate max-w-[360px]">{workspaceDir}</span>
         </div>
-        <select
-          value={shell}
-          onChange={(event) => setShell(event.target.value as LocalShell)}
-          className="bg-[#1E1E1E] border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
-        >
-          <option value="powershell">PowerShell</option>
-          <option value="wsl">Linux / WSL</option>
-        </select>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={addFolderToWorkspace}
+            className="px-2 py-1 rounded border border-gray-700 hover:border-green-500 text-xs text-gray-200 flex items-center gap-1"
+            title="Add Folder to Workspace local"
+          >
+            <FolderPlus size={13} />
+            Add Folder
+          </button>
+          <select
+            value={shell}
+            onChange={(event) => setShell(event.target.value as LocalShell)}
+            className="bg-[#1E1E1E] border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+          >
+            <option value="powershell">PowerShell</option>
+            <option value="wsl">Linux / WSL</option>
+            <option value="termux">Termux / ADB</option>
+          </select>
+        </div>
       </div>
 
       <pre className="flex-1 overflow-auto p-3 text-xs text-gray-300 whitespace-pre-wrap font-mono">
