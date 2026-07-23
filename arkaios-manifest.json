@@ -70,12 +70,22 @@
     {
       "id": "neuralagent-ai-local",
       "name": "NeuralAgent AI Local",
+      "url": "local:C:\\ARKAIOS\\arkaios-neural-agent-main",
+      "path": "arkaios-neural-agent-main",
+      "required": false,
+      "runtime": "python+electron",
+      "bootstrap": "neural-puter-bootstrap.ps1",
+      "notes": "NeuralAgent real: backend FastAPI en 127.0.0.1:8000, local bridge, eyes/hands y desktop Electron."
+    },
+    {
+      "id": "neuralagent-ai-empty-legacy",
+      "name": "NeuralAgent AI Legacy Empty Folder",
       "url": "local:C:\\ARKAIOS\\neuralagentAI-main",
       "path": "neuralagentAI-main",
       "required": false,
-      "runtime": "unknown",
+      "runtime": "none",
       "bootstrap": "neural-puter-bootstrap.ps1",
-      "notes": "Detectado como carpeta vacia al 2026-07-22; no se usa como dependencia activa hasta tener entrada real."
+      "notes": "Carpeta vacia detectada; se conserva solo como referencia legacy/no activa."
     }
   ],
   "localCapabilities": {

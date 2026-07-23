@@ -77,15 +77,17 @@ Conclusión técnica:
 
 Validación real al 2026-07-22:
 
-- `C:\ARKAIOS\Agente Autonomo MVP\arkaios_virtual_body_v1` sí tiene runtime real: FastAPI en `127.0.0.1:8787`.
+- `C:\ARKAIOS\arkaios-neural-agent-main` sí es el NeuralAgent real. Incluye backend FastAPI, bridge local, desktop Electron, Puter Home, eyes/hands y release instalable.
+- `C:\ARKAIOS\Agente Autonomo MVP\arkaios_virtual_body_v1` sí tiene runtime real alternativo: FastAPI en `127.0.0.1:8787`.
 - `C:\ARKAIOS\puter-internetOS` sí tiene runtime real: Node/npm con `npm start`, URL esperada `http://puter.localhost:4100`.
-- `C:\ARKAIOS\neuralagentAI-main` existe, pero está vacío; no puede ser dependencia activa hasta que tenga código o entrada clara.
+- `C:\ARKAIOS\neuralagentAI-main` existe, pero está vacío; no se usa como dependencia activa.
 
 No hacen falta los tres repos para autoejecutar una prueba básica:
 
-1. Para cuerpo/agente local: arrancar Virtual Body.
-2. Para interfaz tipo OS/LAB: arrancar Puter Internet OS.
-3. NeuralAgent se mantiene como placeholder hasta tener archivos reales.
+1. Para NeuralAgent real: arrancar `arkaios-neural-agent-main`.
+2. Para cuerpo/agente local ligero: arrancar Virtual Body.
+3. Para interfaz tipo OS/LAB: arrancar Puter Internet OS.
+4. `neuralagentAI-main` queda descartado como carpeta vacía/legacy.
 
 Bootstrap incluido:
 
@@ -97,6 +99,24 @@ Arrancar solo Virtual Body:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartVirtualBody -LaunchBrowser
+```
+
+Arrancar NeuralAgent completo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartNeuralAgent -LaunchBrowser
+```
+
+Arrancar NeuralAgent Core:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartNeuralCore -LaunchBrowser
+```
+
+Arrancar NeuralAgent Puter Bridge:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartNeuralPuterBridge -LaunchBrowser
 ```
 
 Arrancar solo Puter:
@@ -112,6 +132,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-
 ```
 
 El bootstrap no instala autorun, no abre puertos externos y no habilita acciones destructivas. Virtual Body solo escucha en `127.0.0.1` y mantiene confirmación para mouse/teclado/acciones de bridge.
+
+Puertos esperados:
+
+- NeuralAgent backend/bridge: `http://127.0.0.1:8000/local-bridge`
+- NeuralAgent eyes/hands: `http://127.0.0.1:8001`
+- NeuralAgent Puter Home: `http://127.0.0.1:4177`
+- Puter Internet OS: `http://puter.localhost:4100`
+- Virtual Body ligero: `http://127.0.0.1:8787`
 
 ## Siguiente fase recomendada
 
