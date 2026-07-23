@@ -118,6 +118,32 @@ En Windows también puedes usar:
 ARRANCAR_ARKAIOS_LOCAL.cmd
 ```
 
+## Bootstrapper Arkaios
+
+El repo incluye un instalador seguro tipo `irm | iex` para desplegar el LAB local desde GitHub:
+
+```powershell
+irm https://raw.githubusercontent.com/djklmr2025/TRAE-G/main/install.ps1 | iex
+```
+
+También puede probarse localmente:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -InstallDir "$env:USERPROFILE\ArkaiosLab" -Launch
+```
+
+El manifest de módulos está en:
+
+```text
+arkaios-manifest.json
+```
+
+Documentación técnica:
+
+```text
+docs/ARKAIOS_SOVEREIGN_AGENT.md
+```
+
 ## Empaquetado
 
 El artefacto de release debe ser un `.zip` completo del paquete portable, no solo el binario.

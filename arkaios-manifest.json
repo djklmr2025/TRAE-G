@@ -1,0 +1,55 @@
+{
+  "name": "Arkaios Sovereign Lab",
+  "version": "1.0.0",
+  "defaultInstallDir": "%USERPROFILE%\\ArkaiosLab",
+  "repos": [
+    {
+      "id": "trae-g",
+      "name": "TRAE-G Arkaios Local Lab",
+      "url": "https://github.com/djklmr2025/TRAE-G.git",
+      "path": "TRAE-G",
+      "required": true,
+      "runtime": "node",
+      "install": "npm install",
+      "build": "npm run build"
+    },
+    {
+      "id": "agent-core",
+      "name": "Arkaios Agent Core",
+      "url": "https://github.com/djklmr2025/Arkaios-AI-Provider.git",
+      "path": "Arkaios-Agent-Core",
+      "required": false,
+      "runtime": "node"
+    },
+    {
+      "id": "service-api",
+      "name": "Servidor Arkaios API",
+      "url": "https://github.com/djklmr2025/Servidor_Arkaios_API.git",
+      "path": "Servidor_Arkaios_API",
+      "required": false,
+      "runtime": "node"
+    },
+    {
+      "id": "dj-nexus",
+      "name": "Arkaios DJ Nexus",
+      "url": "https://github.com/djklmr2025/Arkaios-DJ-Nexus.git",
+      "path": "Arkaios-DJ-Nexus",
+      "required": false,
+      "runtime": "dotnet"
+    }
+  ],
+  "localCapabilities": {
+    "workspaceFiles": true,
+    "powershell": true,
+    "wsl": true,
+    "termuxAdb": true,
+    "git": true,
+    "browser": true,
+    "desktopControl": "planned",
+    "adminMode": "explicit-confirmation-required"
+  },
+  "codexIntegration": {
+    "supportedMode": "official-login-required",
+    "notes": "Arkaios puede detectar y lanzar la CLI/extensión oficial si existe, pero no copia tokens ni sesiones privadas."
+  }
+}
