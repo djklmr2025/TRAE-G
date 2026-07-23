@@ -22,6 +22,22 @@ function Resolve-TemplatePath([string]$Value) {
 }
 
 function Invoke-SafeGitCloneOrPull([string]$Url, [string]$Target) {
+  if ($Url.StartsWith("local:", [System.StringComparison]::OrdinalIgnoreCase)) {
+    $source = $Url.Substring(6)
+    if (-not (Test-Path -LiteralPath $source)) {
+      Write-Host "Origen local no existe: $source" -ForegroundColor Yellow
+      return
+    }
+
+    if (-not (Test-Path -LiteralPath $Target)) {
+      New-Item -ItemType Directory -Path $Target -Force | Out-Null
+    }
+
+    Write-Host "Sincronizando módulo local: $source -> $Target"
+    Copy-Item -Path (Join-Path $source "*") -Destination $Target -Recurse -Force
+    return
+  }
+
   if (Test-Path -LiteralPath (Join-Path $Target ".git")) {
     Write-Host "Actualizando: $Target"
     git -C $Target pull --ff-only

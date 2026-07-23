@@ -71,6 +71,7 @@ Conclusión técnica:
 - `UI-TARS`: posible control visual/desktop.
 - `arkaios-desktop-control`: posible control del PC anfitrión.
 - `neuralagentAI-main` y `arkaios-neural-agent-main`: candidatos para integrar lógica neural/agente.
+- `agent-bridge`: messenger local auditable entre agentes. Incluye CLI, MCP, daemon, salas council y bootstrap `bridge-bootstrap.ps1`.
 
 ## Siguiente fase recomendada
 
@@ -85,3 +86,31 @@ Crear un `tool-router` interno para que el chat pueda pedir acciones estructurad
 ```
 
 El router decide si ejecuta, pide confirmación o rechaza según permisos.
+
+## Agent Bridge
+
+El bridge local detectado está en:
+
+```text
+C:\ARKAIOS\agent-bridge
+```
+
+Validación:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ARKAIOS\agent-bridge\bridge-bootstrap.ps1 -StatusOnly
+```
+
+Ejecutar daemon en primer plano:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ARKAIOS\agent-bridge\bridge-bootstrap.ps1 -Daemon
+```
+
+Instalar autorun explícito:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ARKAIOS\agent-bridge\bridge-bootstrap.ps1 -InstallAutorun
+```
+
+Nota: `C:\ARKAIOS\whats app` se detectó como export/backup de WhatsApp con texto y media, no como ejecutable de puente.

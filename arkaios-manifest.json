@@ -36,6 +36,16 @@
       "path": "Arkaios-DJ-Nexus",
       "required": false,
       "runtime": "dotnet"
+    },
+    {
+      "id": "agent-bridge-local",
+      "name": "Arkaios Agent Bridge Local Messenger",
+      "url": "local:C:\\ARKAIOS\\agent-bridge",
+      "path": "agent-bridge",
+      "required": false,
+      "runtime": "python",
+      "bootstrap": "bridge-bootstrap.ps1",
+      "notes": "Canal local auditable para mensajes directos y salas council entre agentes."
     }
   ],
   "localCapabilities": {
