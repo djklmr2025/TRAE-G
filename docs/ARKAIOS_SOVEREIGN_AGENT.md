@@ -73,6 +73,46 @@ Conclusión técnica:
 - `neuralagentAI-main` y `arkaios-neural-agent-main`: candidatos para integrar lógica neural/agente.
 - `agent-bridge`: messenger local auditable entre agentes. Incluye CLI, MCP, daemon, salas council y bootstrap `bridge-bootstrap.ps1`.
 
+## NeuralAgent + Puter por PowerShell
+
+Validación real al 2026-07-22:
+
+- `C:\ARKAIOS\Agente Autonomo MVP\arkaios_virtual_body_v1` sí tiene runtime real: FastAPI en `127.0.0.1:8787`.
+- `C:\ARKAIOS\puter-internetOS` sí tiene runtime real: Node/npm con `npm start`, URL esperada `http://puter.localhost:4100`.
+- `C:\ARKAIOS\neuralagentAI-main` existe, pero está vacío; no puede ser dependencia activa hasta que tenga código o entrada clara.
+
+No hacen falta los tres repos para autoejecutar una prueba básica:
+
+1. Para cuerpo/agente local: arrancar Virtual Body.
+2. Para interfaz tipo OS/LAB: arrancar Puter Internet OS.
+3. NeuralAgent se mantiene como placeholder hasta tener archivos reales.
+
+Bootstrap incluido:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StatusOnly
+```
+
+Arrancar solo Virtual Body:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartVirtualBody -LaunchBrowser
+```
+
+Arrancar solo Puter:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartPuter -LaunchBrowser
+```
+
+Arrancar ambos:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\neural-puter\neural-puter-bootstrap.ps1 -StartPuter -StartVirtualBody -LaunchBrowser
+```
+
+El bootstrap no instala autorun, no abre puertos externos y no habilita acciones destructivas. Virtual Body solo escucha en `127.0.0.1` y mantiene confirmación para mouse/teclado/acciones de bridge.
+
 ## Siguiente fase recomendada
 
 Crear un `tool-router` interno para que el chat pueda pedir acciones estructuradas:

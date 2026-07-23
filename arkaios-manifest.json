@@ -46,6 +46,36 @@
       "runtime": "python",
       "bootstrap": "bridge-bootstrap.ps1",
       "notes": "Canal local auditable para mensajes directos y salas council entre agentes."
+    },
+    {
+      "id": "puter-internet-os-local",
+      "name": "Puter Internet OS Local",
+      "url": "local:C:\\ARKAIOS\\puter-internetOS",
+      "path": "puter-internetOS",
+      "required": false,
+      "runtime": "node",
+      "bootstrap": "neural-puter-bootstrap.ps1",
+      "notes": "Capa visual/OS web opcional. Arranque esperado por npm start en http://puter.localhost:4100."
+    },
+    {
+      "id": "arkaios-virtual-body-local",
+      "name": "ARKAIOS Virtual Body Local",
+      "url": "local:C:\\ARKAIOS\\Agente Autonomo MVP\\arkaios_virtual_body_v1",
+      "path": "arkaios_virtual_body_v1",
+      "required": false,
+      "runtime": "python",
+      "bootstrap": "neural-puter-bootstrap.ps1",
+      "notes": "API local segura en 127.0.0.1:8787 para pantalla, voz, archivos workspace y acciones confirmadas."
+    },
+    {
+      "id": "neuralagent-ai-local",
+      "name": "NeuralAgent AI Local",
+      "url": "local:C:\\ARKAIOS\\neuralagentAI-main",
+      "path": "neuralagentAI-main",
+      "required": false,
+      "runtime": "unknown",
+      "bootstrap": "neural-puter-bootstrap.ps1",
+      "notes": "Detectado como carpeta vacia al 2026-07-22; no se usa como dependencia activa hasta tener entrada real."
     }
   ],
   "localCapabilities": {
